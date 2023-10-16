@@ -1,0 +1,210 @@
+// Model Güncellendiğinde yapılacaklar:
+// 1-" npx prisma generate " bunu terminale yaz (enter!)
+// 2- VS Codu kapatıp yeniden aç.
+// ! Sırayla yaparsan gücelleme gerçekleşir.
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Measurements {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  firstValue String?
+
+  secondValue String?
+  unit        String?
+
+  oneRangeEnabled  Boolean
+  twoRangeEnabled  Boolean
+  manuelDefined    Boolean
+  translateEnabled Boolean?
+
+  turkish   String?
+  ukrainian String?
+  english   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Fabrics {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  fabricType        String
+  fabricDescription String?
+  fabricSwatch      String?
+
+  image String?
+
+  translateEnabled Boolean?
+  addSwatchEnabled Boolean?
+
+  fabricTypeTurkish   String?
+  fabricTypeUkrainian String?
+  fabricTypeEnglish   String?
+
+  fabricDescriptionTurkish   String?
+  fabricDescriptionUkrainian String?
+  fabricDescriptionEnglish   String?
+
+  fabricSwatchTurkish   String?
+  fabricSwatchUkrainian String?
+  fabricSwatchEnglish   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Metals {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  metalType        String
+  metalDescription String?
+  image            String?
+
+  translateEnabled Boolean?
+
+  metalTypeTurkish   String?
+  metalTypeUkrainian String?
+  metalTypeEnglish   String?
+
+  metalDescriptionTurkish   String?
+  metalDescriptionUkrainian String?
+  metalDescriptionEnglish   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Colors {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  colourType        String
+  colourDescription String?
+
+  translateEnabled    Boolean?
+  colourPickerEnabled Boolean?
+  colourHex           String?
+
+  colourTypeTurkish   String?
+  colourTypeUkrainian String?
+  colourTypeEnglish   String?
+
+  colourDescriptionTurkish   String?
+  colourDescriptionUkrainian String?
+  colourDescriptionEnglish   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Products {
+  id                     String           @id @default(auto()) @map("_id") @db.ObjectId
+  productCode            String
+  productName            String
+  productType            String
+  selectedCategoryKey    String
+  selectedCategoryValues String
+  productFeatures        ProductFeature[]
+  createdAt              DateTime         @default(now())
+  updatedAt              DateTime         @updatedAt
+
+  productNameTR     String?
+  productTypeTR     String?
+  productCategoryTR String?
+
+  productNameUA     String?
+  productTypeUA     String?
+  productCategoryUA String?
+
+  productNameEN     String?
+  productTypeEN     String?
+  productCategoryEN String?
+}
+
+model ProductFeature {
+  id                     String   @id @default(auto()) @map("_id") @db.ObjectId
+  index                  Int
+  feature                String
+  featureId              String
+  targetValue            String
+  checked                Boolean
+  value                  String?
+  imageValue             String?
+  extraValue             String?
+  product                Products @relation(fields: [productId], references: [id])
+  productId              String   @map("productId") @db.ObjectId
+  productName            String
+  productType            String
+  selectedCategoryKey    String
+  selectedCategoryValues String
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+}
+
+model Collections {
+  id                    String  @id @default(auto()) @map("_id") @db.ObjectId
+  collectionCode        String
+  collectionName        String
+  collectionType        String
+  collectionDescription String?
+
+  collectionNameTR        String?
+  collectionTypeTR        String?
+  collectionDescriptionTR String?
+
+  collectionNameUA        String?
+  collectionTypeUA        String?
+  collectionDescriptionUA String?
+
+  collectionNameEN        String?
+  collectionTypeEN        String?
+  collectionDescriptionEN String?
+}
+
+model CollectionProducts {
+  id           String @id @default(auto()) @map("_id") @db.ObjectId
+  collectionId String
+  productId    String
+  productCode  String
+  productName  String
+}
+
+model CollectionImages {
+  id              String  @id @default(auto()) @map("_id") @db.ObjectId
+  collectionId    String?
+  collectionImage String?
+}
+
+// Eklenen
+model FinancialManagement {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  operationName   String
+  priceType       String
+  condition       Boolean
+  conditionType   String?
+  conditionValue  String?
+  conditionValue2 String?
+  mathOperator    String
+  finalPrice      String
+  orderValue      Int
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// Eklenen
+model FinancialManagementSpecial {
+  id                    String   @id @default(auto()) @map("_id") @db.ObjectId
+  financialManagementId String
+  mathOperatorSpecial   String
+  conditionValueSpecial String
+  ozelBaremValue        Int
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}
