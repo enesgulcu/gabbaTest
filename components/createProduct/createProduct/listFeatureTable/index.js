@@ -18,6 +18,7 @@ const ListFeatureTable = ({
   filterProductCode, 
   filterProductName, 
   filterProductType, 
+  filterProductPrice,
   filterProductCategory, 
   filterEnabled, 
   setIsUpdateEnabled, 
@@ -375,7 +376,7 @@ const deleteProdcut = async (id, process) => {
 
 
   const renderHead = () => {
-    const tableHeaders = ["sıra","Ürün Kodu", "Ürün Adı", "Ürün Tipi", "Seçilen Kategori", "Ürün Resmi","Dil Çevirisi", "Ürün Özellikleri", "İşlem" ]
+    const tableHeaders = ["sıra","Ürün Kodu", "Ürün Adı", "Ürün Tipi", "Ürün Fiyatı", "Seçilen Kategori", "Ürün Resmi","Dil Çevirisi", "Ürün Özellikleri", "İşlem" ]
 
     // koleksiyon modu aktif ise header bölümüne "Seç" ifadesi eklenir.
     collectionModeEnabled && tableHeaders.unshift("Seç");
@@ -472,6 +473,14 @@ const renderData = () => {
         } border-r border-b border-black text-center` 
         }>
           <div>{prodcutItem.productType}</div>
+        </td>
+
+        {/* ürün fiyatı */}
+        <td className={`${
+          collectionModeEnabled && chooseProducts && chooseProducts.length > 0 && chooseProducts.filter((item) => item.productId === prodcutItem.id).length > 0 ? "bg-white" : "bg-gray-100"
+        } border-r border-b border-black text-center`
+        }>
+          <div>{prodcutItem.productPrice}</div>
         </td>
 
         {/* seçilen kategori */}

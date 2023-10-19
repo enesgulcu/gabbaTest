@@ -109,6 +109,7 @@ model Products {
   productCode            String
   productName            String
   productType            String
+  productPrice           String?
   selectedCategoryKey    String
   selectedCategoryValues String
   productFeatures        ProductFeature[]
@@ -142,6 +143,7 @@ model ProductFeature {
   productId              String   @map("productId") @db.ObjectId
   productName            String
   productType            String
+  productPrice           String?
   selectedCategoryKey    String
   selectedCategoryValues String
   createdAt              DateTime @default(now())

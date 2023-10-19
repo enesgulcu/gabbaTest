@@ -16,6 +16,7 @@ const checkData = async (measurements) => {
   newMeasurements.forEach((measurement, index) => {
     if(newMeasurements[index]){
 
+
 //####################################################################################
       // ######### sadece " Tek Ölçü Ekleme Aktif " ise burası çalışır
       if(measurement.oneRangeEnabled){
@@ -98,6 +99,8 @@ const handler = async (req, res) => {
     if (req.method === "POST") {
       
       const {measurements, data, processType} = req.body;
+
+
       
       //silme işlemi için gelen veriyi sileriz.
       if(!measurements && processType == "delete"){
@@ -117,6 +120,32 @@ const handler = async (req, res) => {
         if(!checkedData && checkedData.error){
           throw "Bir hata oluştu. Lütfen teknik birimle iletişime geçiniz. XR09KU2";
         }
+
+        // veri tabanındaki verileri çekiyoruz.
+        const getAllmeasurements = await getAllData("measurements");
+        if (!getAllmeasurements || getAllmeasurements.error) {
+          throw "İşlem yapılırken bir hata oluştu . XREEKU4";
+        }
+
+        // veri tabanından gelen firstValue verisi ile göndermek istediğimiz firstValue verisi ile eşitliğini sorguluyoruz.
+        // eşitlik var ise hata döndürürüz.
+        checkedData.forEach((item, index) => {
+
+          getAllmeasurements.forEach((measurement, index) => {
+
+            if(item.oneRangeEnabled && parseInt(item.firstValue.match(/\d+/g).join("")) == parseInt(measurement.firstValue.match(/\d+/g).join(""))){
+              throw `" ${item.firstValue} ${item.secondValue && " - " + item.secondValue} " Bu ölçü zaten mevcut. XROOKU4`;
+            }
+
+            if(item.twoRangeEnabled && parseInt(item.firstValue.match(/\d+/g).join("")) == parseInt(measurement.firstValue.match(/\d+/g).join("")) && item.secondValue == measurement.secondValue){
+              throw `" ${item.firstValue} ${item.secondValue && " - " + item.secondValue} " Bu ölçü zaten mevcut. XROOKU5`;
+            }
+
+            if(item.manuelDefined && item.firstValue.trim() == measurement.firstValue.trim()){
+              throw `" ${item.firstValue} ${item.secondValue && " - " + item.secondValue} " Bu ölçü zaten mevcut. XROOKU6`;
+            }
+          })
+        });
         
         // id değerini silip yeni veriyi oluşturuyoruz.
         const NewDatawitoutId = checkedData.map(item => {
@@ -145,6 +174,31 @@ const handler = async (req, res) => {
         if(!checkedData){
           throw "Bir hata oluştu. Lütfen teknik birimle iletişime geçiniz. XR09KU2";
         }
+
+        // veri tabanındaki verileri çekiyoruz.
+        const getAllmeasurements = await getAllData("measurements");
+        if (!getAllmeasurements || getAllmeasurements.error) {
+          throw "İşlem yapılırken bir hata oluştu . XROOKU4";
+        }
+
+        // veri tabanından gelen firstValue verisi ile göndermek istediğimiz firstValue verisi ile eşitliğini sorguluyoruz.
+        // eşitlik var ise hata döndürürüz.
+        checkedData.forEach((item, index) => {
+          getAllmeasurements.forEach((measurement, index) => {
+
+            if(item.oneRangeEnabled && parseInt(item.firstValue.match(/\d+/g).join("")) == parseInt(measurement.firstValue.match(/\d+/g).join(""))){
+              throw `" ${item.firstValue} ${item.secondValue && " - " + item.secondValue} " Bu ölçü zaten mevcut. XROOKU1`;
+            }
+
+            if(item.twoRangeEnabled && parseInt(item.firstValue.match(/\d+/g).join("")) == parseInt(measurement.firstValue.match(/\d+/g).join("")) && item.secondValue == measurement.secondValue){
+              throw `" ${item.firstValue} ${item.secondValue && " - " + item.secondValue} " Bu ölçü zaten mevcut. XROOKU2`;
+            }
+
+            if(item.manuelDefined && item.firstValue.trim() == measurement.firstValue.trim()){
+              throw `" ${item.firstValue} ${item.secondValue && " - " + item.secondValue} " Bu ölçü zaten mevcut. XROOKU3`;
+            }
+          })
+        });
 
         const createdNewData = await createNewDataMany("measurements", checkedData);
         if(!createdNewData || createdNewData.error){

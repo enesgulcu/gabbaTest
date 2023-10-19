@@ -4,20 +4,39 @@ import {
   createNewDataMany,
   createNewData,
   deleteDataByAny,
+  deleteDataByMany,
+  updateDataByAny,
   findAndUpdateManyFinancialManagement,
 } from '@/services/serviceOperations';
 
 const handler = async (req, res) => {
   try {
     if (req.method === 'POST') {
-      const { data, processType } = req.body;
+      // Özel işlemlerde verinin var olup olmadığını kontrol ediyoruz.
+
+      const { data, processType, id } = req.body;
+
+      // 1. SİLME İŞLEMİ
       if (data && processType == 'delete') {
         const deleteData = await deleteDataByAny('financialManagement', {
           id: data,
         });
+
         if (!deleteData || deleteData.error) {
-          throw deleteData;
+          throw 'Bir hata oluştu. Lütfen teknik birimle iletişime geçiniz. XR07KY1';
         }
+
+        const deleteSpecialData = await deleteDataByMany(
+          'financialManagementSpecial',
+          {
+            financialManagementId: data,
+          }
+        );
+
+        if (!deleteSpecialData || deleteSpecialData.error) {
+          throw deleteSpecialData;
+        }
+
         return res.status(200).json({
           status: 'success',
           data: deleteData,
@@ -25,31 +44,146 @@ const handler = async (req, res) => {
         });
       }
 
+      data.financialManagementSpecial = data.financialManagementSpecial.filter(
+        (item) => {
+          return !(
+            item.mathOperatorSpecial === '' ||
+            (item.conditionValueSpecial === 'Özel Barem Ekle' &&
+              item.ozelBaremValue === 0)
+          );
+        }
+      );
+
+      if (data.financialManagementSpecial.length === 0) {
+        delete data.financialManagementSpecial;
+      }
+
+      const financialManagementSpecial = data.financialManagementSpecial;
+
+      // 2. GÜNCELLEME İŞLEMİ
+      if (data && processType == 'update') {
+        data.conditionValue = data.conditionValue.toString();
+        data.conditionValue2 = data.conditionValue2.toString();
+        data.finalPrice = data.finalPrice.toString();
+        data.orderValue = parseInt(data.orderValue);
+
+        // Eğer işlem sırası değişsin diyorsa, burası çalışır
+        if (data.orderCondition) {
+          // Gelen veriyi al ve işleme sok. Bu değerden büyük olan her işlem sırasının değerini 1 arttır.
+          const updatedData = await findAndUpdateManyFinancialManagement(
+            'financialManagement',
+            data.orderValue
+          );
+
+          if (!updatedData || updatedData.error) {
+            throw 'Bir hata oluştu. Lütfen teknik birimle iletişime geçiniz. XR07KU1';
+          }
+        }
+
+        delete data.orderCondition;
+        delete data.financialManagementSpecial;
+
+        // Gelen verileri güncelliyoruz.
+        const updateData = await updateDataByAny(
+          'financialManagement',
+          {
+            id: id,
+          },
+          data
+        );
+
+        if (!updateData || updateData.error) {
+          throw 'Bir hata oluştu. Lütfen teknik birimle iletişime geçiniz. XR07KU3';
+        }
+
+        // Var olan özel işlemleri silip, yenilerini ekliyoruz.
+        const deleteSpecialData = await deleteDataByMany(
+          'financialManagementSpecial',
+          {
+            financialManagementId: updateData.id,
+          }
+        );
+
+        if (!deleteSpecialData || deleteSpecialData.error) {
+          throw 'Bir hata oluştu. Lütfen teknik birimle iletişime geçiniz. XR07KU4';
+        }
+
+        if (financialManagementSpecial) {
+          //console.log(financialManagementSpecial);
+          financialManagementSpecial.forEach((item) => {
+            item.financialManagementId = updateData.id;
+          });
+
+          const createdData = await createNewDataMany(
+            'financialManagementSpecial',
+            financialManagementSpecial
+          );
+
+          if (!createdData || createdData.error) {
+            throw 'Bir hata oluştu. Lütfen teknik birimle iletişime geçiniz. XR07KU5';
+          }
+
+          return res.status(200).json({
+            status: 'success',
+            data: createdData,
+            message: 'İşlem başarılı',
+          });
+        }
+
+        return res.status(200).json({
+          status: 'success',
+          data: updateData,
+          message: 'İşlem başarılı',
+        });
+      }
+
       if (!data) {
         throw 'Bir hata oluştu. Lütfen teknik birimle iletişime geçiniz. XR09KY1';
       }
 
+      // Eğer kullanıcı herhangi bir sıralama değeri yazarsa, aşağıdaki işlemler yapılacak
       if (data.orderCondition) {
         data.conditionValue = data.conditionValue.toString();
         data.conditionValue2 = data.conditionValue2.toString();
         data.finalPrice = data.finalPrice.toString();
         data.orderValue = parseInt(data.orderValue);
+
         const updatedData = await findAndUpdateManyFinancialManagement(
           'financialManagement',
           data.orderValue
         );
+
         if (!updatedData || updatedData.error) {
           throw 'Bir hata oluştu. Lütfen teknik birimle iletişime geçiniz. XR09KU3';
         }
+
         delete data.orderCondition;
         delete data.financialManagementSpecial;
+
         const createdNewData = await createNewData('financialManagement', data);
-        console.log(createdNewData);
 
         if (!createdNewData || createdNewData.error) {
           throw 'Bir hata oluştu. Lütfen teknik birimle iletişime geçiniz. XR09KU4';
         }
-        console.log(updatedData);
+
+        if (financialManagementSpecial) {
+          //console.log(financialManagementSpecial);
+          financialManagementSpecial.forEach((item) => {
+            item.financialManagementId = createdNewData.id;
+          });
+
+          const createdData = await createNewDataMany(
+            'financialManagementSpecial',
+            financialManagementSpecial
+          );
+
+          return res.status(200).json({
+            status: 'success',
+            data: createdData,
+            message: 'İşlem başarılı',
+          });
+        }
+
         return res.status(200).json({
           status: 'success',
           data: createdNewData,
@@ -57,7 +191,6 @@ const handler = async (req, res) => {
         });
       } else {
         // Eğer kullanıcı herhangi bir sıralama değeri yazmaz ise, aşağıdaki işlemler yapılacak
-        const financialManagementSpecial = data.financialManagementSpecial;
         delete data.orderCondition; // Eğer kullanıcı herhangi bir işlem sırası belirlemediyse bunu objeden sil
 
         // Integer değerleri string'e çevriliyor.
@@ -73,17 +206,16 @@ const handler = async (req, res) => {
         // Ve burada işlem sırasını eklemiş oluyoruz. Otomatik artan bir değer.
         data.orderValue = maxOperationOrder;
 
-        // Finansal Yönetim işleri eklerken, özel değerleri objeden siliyoruz.
-        // Çünkü prismada bu değerler yok ve hata alacak
         delete data.financialManagementSpecial;
 
-        // Finansal Yönetim işlerini ekliyoruz.
+        //Finansal Yönetim işlerini ekliyoruz.
         const createdNewData = await createNewData('financialManagement', data);
         if (!createdNewData || createdNewData.error) {
           throw 'Bir hata oluştu. Lütfen teknik birimle iletişime geçiniz. XR09KU5';
         }
 
         if (financialManagementSpecial) {
+          //console.log(financialManagementSpecial);
           financialManagementSpecial.forEach((item) => {
             item.financialManagementId = createdNewData.id;
           });

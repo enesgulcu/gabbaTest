@@ -3,223 +3,33 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { getAPI, postAPI } from '@/services/fetchAPI';
+import FinancialManagementCalculate from '@/functions/others/financialManagementCalculate';
 
 function ListFinancialComponent({
+  filterOperationName,
+  filterPriceType,
+  filterConditionStatus,
+  filterConditionType,
+  filterConditionValue,
+  filterConditionValue2,
+  filterMathOperator,
+  filterFinalPrice,
   financialManagements,
   setFinancialManagement,
+  isloading,
+  setIsloading,
+  getData,
+  toast,
+  setEditFinancialManagement,
+  setEditFinancialManagementData,
+  setCreateFinancialManagement,
+  setFilterEnabled,
+  setTestEnabled,
 }) {
-  const [isloading, setIsloading] = useState(false);
+  const [filteredData, setFilteredData] = useState([]); // filtrelenmiş veriler
 
-  const mathOperators = {
-    ADD: '+',
-    SUBTRACT: '-',
-    MULTIPLY: 'x',
-    DIVIDE: '÷',
-    PERCENT: '%',
-    SUBTRACT_PERCENT: '-%',
-    ADD_PERCENT: '+%',
-  };
+  useEffect(() => {}, []);
 
-  const priceTypes = {
-    LIST: 'Liste Fiyatı',
-    LIST_MULTIPLY_STOCK: 'Liste Fiyatı x Adet Miktarı',
-  };
-
-  async function test(price = 100, stock = 10) {
-    const response = await getAPI('/createProduct/financialManagement');
-    response.data.sort((a, b) => a.orderValue - b.orderValue);
-    const responseSpecial = await getAPI(
-      '/createProduct/financialManagementSpecial'
-    );
-    let result = [];
-    response.data.forEach((element, index) => {
-      result.length > 0
-        ? (result[index] = result[index - 1])
-        : (result[index] = price);
-
-      element.priceType === priceTypes.LIST_MULTIPLY_STOCK
-        ? (result[index] = result[index] * stock)
-        : (result[index] = result[index]);
-      // Eğer koşul varsa, burayı çalıştır. (<, >, =, !=, <=, >=)
-      if (element.condition) {
-        console.log('Koşul var');
-      } else {
-        // Eğer koşul yoksa, burayı çalıştır.
-
-        if (element.mathOperator === mathOperators.ADD) {
-          result[index] = result[index] + parseInt(element.finalPrice);
-        }
-
-        if (element.mathOperator === mathOperators.SUBTRACT) {
-          result[index] = result[index] - parseInt(element.finalPrice);
-        }
-
-        if (element.mathOperator === mathOperators.MULTIPLY) {
-          result[index] = result[index] * parseInt(element.finalPrice);
-        }
-
-        if (element.mathOperator === mathOperators.DIVIDE) {
-          result[index] = result[index] / parseInt(element.finalPrice);
-        }
-
-        if (element.mathOperator === mathOperators.PERCENT) {
-          result[index] = (result[index] * parseInt(element.finalPrice)) / 100;
-        }
-
-        if (element.mathOperator === mathOperators.SUBTRACT_PERCENT) {
-          result[index] =
-            result[index] -
-            (result[index] * parseInt(element.finalPrice)) / 100;
-        }
-
-        if (element.mathOperator === mathOperators.ADD_PERCENT) {
-          result[index] =
-            result[index] +
-            (result[index] * parseInt(element.finalPrice)) / 100;
-        }
-        responseSpecial.data
-          .filter((item) => {
-            return item.financialManagementId === element.id;
-          })
-          .forEach((item, specialIndex) => {
-            if (
-              item.conditionValueSpecial == 'Özel Barem Ekle' &&
-              item.ozelBaremValue > 0
-            ) {
-              //result[index] = result[index] + parseInt(item.ozelBaremValue);
-              if (item.mathOperatorSpecial === mathOperators.ADD) {
-                // Özel İşlem Toplama
-                result[index] = result[index] + parseFloat(item.ozelBaremValue);
-              }
-
-              // Özel İşlem Çıkarma
-              if (item.mathOperatorSpecial === mathOperators.SUBTRACT) {
-                result[index] = result[index] - parseFloat(item.ozelBaremValue);
-              }
-
-              // Özel İşlem Çarpma
-              if (item.mathOperatorSpecial === mathOperators.MULTIPLY) {
-                result[index] = result[index] * parseFloat(item.ozelBaremValue);
-              }
-
-              // Özel İşlem Bölme
-              if (item.mathOperatorSpecial === mathOperators.DIVIDE) {
-                result[index] = result[index] / parseFloat(item.ozelBaremValue);
-              }
-
-              // Özel İşlem Yüzde
-              if (item.mathOperatorSpecial === mathOperators.PERCENT) {
-                result[index] =
-                  (result[index] * parseFloat(item.ozelBaremValue)) / 100;
-              }
-
-              // Özel İşlem Yüzde Toplama
-              if (item.mathOperatorSpecial === mathOperators.ADD_PERCENT) {
-                result[index] =
-                  result[index] +
-                  (result[index] * parseFloat(item.ozelBaremValue)) / 100;
-              }
-
-              // Özel İşlem Yüzde Çıkarma
-              if (item.mathOperatorSpecial === mathOperators.SUBTRACT_PERCENT) {
-                result[index] =
-                  result[index] -
-                  (result[index] * parseFloat(item.ozelBaremValue)) / 100;
-              }
-            }
-            if (
-              specialIndex == 0 &&
-              item.conditionValueSpecial != 'Özel Barem Ekle'
-            ) {
-              if (item.mathOperatorSpecial === mathOperators.ADD) {
-                // Özel İşlem Toplama
-                result[index] = result[index] + result[index - 1];
-              }
-
-              // Özel İşlem Çıkarma
-              if (item.mathOperatorSpecial === mathOperators.SUBTRACT) {
-                result[index] = result[index] - result[index - 1];
-              }
-
-              // Özel İşlem Çarpma
-              if (item.mathOperatorSpecial === mathOperators.MULTIPLY) {
-                result[index] = result[index] * result[index - 1];
-              }
-
-              // Özel İşlem Bölme
-              if (item.mathOperatorSpecial === mathOperators.DIVIDE) {
-                result[index] = result[index] / result[index - 1];
-              }
-
-              // Özel İşlem Yüzde
-              if (item.mathOperatorSpecial === mathOperators.PERCENT) {
-                result[index] =
-                  (result[index] * parseFloat(result[index - 1])) / 100;
-              }
-
-              // Özel İşlem Yüzde Toplama
-              if (item.mathOperatorSpecial === mathOperators.ADD_PERCENT) {
-                result[index] =
-                  result[index] +
-                  (result[index] * parseFloat(result[index - 1])) / 100;
-              }
-
-              // Özel İşlem Yüzde Çıkarma
-              if (item.mathOperatorSpecial === mathOperators.SUBTRACT_PERCENT) {
-                result[index] =
-                  result[index] -
-                  (result[index] * parseFloat(result[index - 1])) / 100;
-              }
-            }
-
-            if (
-              specialIndex > 0 &&
-              item.conditionValueSpecial != 'Özel Barem Ekle'
-            ) {
-              if (item.mathOperatorSpecial === mathOperators.ADD) {
-                // Özel İşlem Toplama
-                result[index] = result[index] + result[index];
-              }
-
-              // Özel İşlem Çıkarma
-              if (item.mathOperatorSpecial === mathOperators.SUBTRACT) {
-                result[index] = result[index] - result[index];
-              }
-
-              // Özel İşlem Çarpma
-              if (item.mathOperatorSpecial === mathOperators.MULTIPLY) {
-                result[index] = result[index] * result[index];
-              }
-
-              // Özel İşlem Bölme
-              if (item.mathOperatorSpecial === mathOperators.DIVIDE) {
-                result[index] = result[index] / result[index];
-              }
-
-              // Özel İşlem Yüzde
-              if (item.mathOperatorSpecial === mathOperators.PERCENT) {
-                result[index] = (result[index] * result[index]) / 100;
-              }
-
-              // Özel İşlem Yüzde Toplama
-              if (item.mathOperatorSpecial === mathOperators.ADD_PERCENT) {
-                console.log(result);
-                result[index] =
-                  result[index] + (result[index] * result[index]) / 100;
-              }
-
-              // Özel İşlem Yüzde Çıkarma
-              if (item.mathOperatorSpecial === mathOperators.SUBTRACT_PERCENT) {
-                result[index] =
-                  result[index] - (result[index] * result[index]) / 100;
-              }
-            }
-          });
-      }
-    });
-    console.log(result);
-  }
-  test();
   // tablodan veri silme fonksiyonu
   const dataDeleteFunction = async (id) => {
     try {
@@ -228,7 +38,7 @@ function ListFinancialComponent({
         data: id,
         processType: 'delete',
       });
-      console.log(responseData);
+
       if (!responseData || responseData.status !== 'success') {
         throw new Error('Veri silinemedi');
       }
@@ -237,7 +47,6 @@ function ListFinancialComponent({
       toast.success('Veri başarıyla silindi');
     } catch (error) {
       toast.error(error.message);
-      console.log(error);
     }
   };
 
@@ -320,7 +129,11 @@ function ListFinancialComponent({
               <button
                 onClick={() => {
                   // veri güncellemesi için ilk adım.
-                  setUpdateData(colour);
+                  setEditFinancialManagement(true);
+                  setCreateFinancialManagement(false);
+                  setFilterEnabled(false);
+                  setTestEnabled(false);
+                  setEditFinancialManagementData(financialManagement);
                 }}
                 className='shadow-md bg-blue-500 hover:bg-blue-700 text-white font-bold p-2 rounded-md min-w-[50px]'
               >

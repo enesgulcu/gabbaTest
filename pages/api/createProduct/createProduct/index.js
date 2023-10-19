@@ -32,7 +32,6 @@ const handler = async (req, res) => {
           delete item.productId;
         }
 
-
         return true;
       });
   
@@ -40,6 +39,7 @@ const handler = async (req, res) => {
         productCode: data.productCode,
         productName: data.productName,
         productType: data.productType,
+        productPrice: data.productPrice,
         selectedCategoryKey: data.selectedCategoryKey,
         selectedCategoryValues: data.selectedCategoryValues,
         productFeatures: processedFeatures,
@@ -77,7 +77,7 @@ const handler = async (req, res) => {
     if (req.method === "POST") {
       
       const {data, processType, process=null, productId=null} = await req.body;
-      ;
+
       // gelen verileri kontrol fonksiyonunua gönderiyoruz.
       const checkedData = await checkData(data, productId);
       
@@ -170,7 +170,6 @@ const handler = async (req, res) => {
       else if(data && processType == "post"){
 
         const createProducts = await createNewProduct("Products", checkedData);
-
 
         if(!createProducts || createProducts.error){
           throw createProducts; //"Bir hata oluştu. Lütfen teknik birimle iletişime geçiniz. XR09KU3";

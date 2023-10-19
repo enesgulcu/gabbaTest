@@ -112,10 +112,12 @@ const DynamicTable = ({ data, selectedCategoryKey, selectedCategoryValues, newUp
   const [addTypeEnabled, setAddTypeEnabled] = useState(false);
   const [productTypes, setProductTypes] = useState("");
 
+  
+
   const [productName , setProductName] = useState("");
   const [productType, setProductType] = useState("");
+  const [productPrice, setProductPrice] = useState(0);
   const [languageIsEnabled, setLanguageIsEnabled] = useState(false);
-  const [updateData, setUpdateData] = useState("");
 
   const [productNameTR , setProductNameTR] = useState("");
   const [productTypeTR, setProductTypeTR] = useState("");
@@ -132,9 +134,12 @@ const DynamicTable = ({ data, selectedCategoryKey, selectedCategoryValues, newUp
   useEffect( () => {
   if(newUpdateData){
     setCheckboxValues(newUpdateData.productFeatures);
+
+    
   
     setProductName(newUpdateData.createProducts.productName);
     setProductType(newUpdateData.createProducts.productType);
+    setProductPrice(newUpdateData.createProducts.productPrice);
   
     setProductNameTR(newUpdateData.createProducts.productNameTR);
     setProductTypeTR(newUpdateData.createProducts.productTypeTR);
@@ -151,7 +156,7 @@ const DynamicTable = ({ data, selectedCategoryKey, selectedCategoryValues, newUp
     
   }, [newUpdateData])
 
-  const sendData = async (productName, productType, selectedCategoryKey, selectedCategoryValues, checkboxValues) =>{
+  const sendData = async (productName, productType, productPrice, selectedCategoryKey, selectedCategoryValues, checkboxValues) =>{
     setIsloading(true);
 
     // her ürün için uniq olarak bir ürün kodu oluşturuyoruz #########################
@@ -193,6 +198,7 @@ const DynamicTable = ({ data, selectedCategoryKey, selectedCategoryValues, newUp
       productCode: productCode,
       productName: productName,
       productType: productType,
+      productPrice: productPrice,
       selectedCategoryKey: selectedCategoryKey,
       selectedCategoryValues: selectedCategoryValues,
       productFeatures: checkboxValues,
@@ -304,7 +310,7 @@ const DynamicTable = ({ data, selectedCategoryKey, selectedCategoryValues, newUp
   
 
   // Seçilen checkbox değerini state'e ekleyen ana fonksiyon.
-  const handleCheckboxChange = (index, feature, featureId, targetValue, checked, value, productName, productType, selectedCategoryKey, selectedCategoryValues) => {
+  const handleCheckboxChange = (index, feature, featureId, targetValue, checked, value, productName, productType, productPrice, selectedCategoryKey, selectedCategoryValues) => {
     // Değişen checkbox değerini yeni bir nesne olarak hazırla
     
     const newValue = {
@@ -316,6 +322,7 @@ const DynamicTable = ({ data, selectedCategoryKey, selectedCategoryValues, newUp
       value,
       productName,
       productType,
+      productPrice,
       selectedCategoryKey,
       selectedCategoryValues,
     };
@@ -460,7 +467,7 @@ const DynamicTable = ({ data, selectedCategoryKey, selectedCategoryValues, newUp
 
 
                     onChange={(e) => {
-                      handleCheckboxChange(index, selectedFeature, item.id, "standard", e.target.checked, null , productName, productType, selectedCategoryKey, selectedCategoryValues)
+                      handleCheckboxChange(index, selectedFeature, item.id, "standard", e.target.checked, null , productName, productType, productPrice, selectedCategoryKey, selectedCategoryValues)
                     }}
                   />
                   
@@ -474,7 +481,7 @@ const DynamicTable = ({ data, selectedCategoryKey, selectedCategoryValues, newUp
                         value.targetValue === "plus"
                     )}
                   onChange={(e) => {
-                      handleCheckboxChange(index, selectedFeature, item.id, "plus", e.target.checked, null, productName, productType, selectedCategoryKey, selectedCategoryValues)
+                      handleCheckboxChange(index, selectedFeature, item.id, "plus", e.target.checked, null, productName, productType, productPrice, selectedCategoryKey, selectedCategoryValues)
                     }}
                   />
 
@@ -491,7 +498,7 @@ const DynamicTable = ({ data, selectedCategoryKey, selectedCategoryValues, newUp
                     className="w-20 h-10 border border-gray-300 rounded-md ml-0 sm:ml-4 text-center"
                     onChange={(e) => {
                       e.target.value > 0 &&
-                      handleCheckboxChange(index, selectedFeature, item.id, "plus",true, e.target.value.toString(), productName, productType, selectedCategoryKey, selectedCategoryValues)
+                      handleCheckboxChange(index, selectedFeature, item.id, "plus",true, e.target.value.toString(), productName, productType, productPrice, selectedCategoryKey, selectedCategoryValues)
 
                     }}
                   />
@@ -507,7 +514,7 @@ const DynamicTable = ({ data, selectedCategoryKey, selectedCategoryValues, newUp
                       value.targetValue === "minus"
                   )}
                   onChange={(e) => {
-                      handleCheckboxChange(index, selectedFeature, item.id, "minus", e.target.checked, null, productName, productType, selectedCategoryKey, selectedCategoryValues)
+                      handleCheckboxChange(index, selectedFeature, item.id, "minus", e.target.checked, null, productName, productType, productPrice, selectedCategoryKey, selectedCategoryValues)
                     }}
                   />
 
@@ -524,7 +531,7 @@ const DynamicTable = ({ data, selectedCategoryKey, selectedCategoryValues, newUp
                     className="w-20 h-10 border border-gray-300 rounded-md ml-0 sm:ml-4 text-center"
                     onChange={(e) => {
                       e.target.value > 0 &&
-                      handleCheckboxChange(index, selectedFeature, item.id, "minus",true, ((-1 * e.target.value).toString()), productName, productType, selectedCategoryKey, selectedCategoryValues)
+                      handleCheckboxChange(index, selectedFeature, item.id, "minus",true, ((-1 * e.target.value).toString()), productName, productType, productPrice, selectedCategoryKey, selectedCategoryValues)
                     }}
                   />
                   : null
@@ -777,8 +784,27 @@ const DynamicTable = ({ data, selectedCategoryKey, selectedCategoryValues, newUp
                   </div>
                 </div>
               </div>
-            </div>
+          </div>
         </div>
+
+        {/* ürün fiyatı girme inputu */}
+        <div className='flex flex-col justify-center items-center'>
+          <h3 className='text-xl font-semibold text-gray-700 my-2'> Ürün Fiyatı </h3>
+          <div className='flex lg:flex-row gap-4 flex-col'>
+            <input
+              onChange={(e) => {setProductPrice(e.target.value)}}
+              id={`productPrice`}
+              name={`productPrice`}
+              defaultValue={0}
+              value={productPrice}
+              className={`hover:scale-105 transition-all border border-gray-600 rounded-md p-2 mx-4 `}
+              type="number"
+              placeholder="Ürün Fiyatı Giriniz."
+            />
+          </div> 
+        </div>
+
+
         <div className="flex flex-col justify-end items-center hover:scale-110 transition-all hover:cursor-pointer"
         onClick={()=>setLanguageIsEnabled(!languageIsEnabled)}>
           <Image src="/translate.svg" width={40} height={40} alt="image"/>
@@ -1031,7 +1057,7 @@ const DynamicTable = ({ data, selectedCategoryKey, selectedCategoryValues, newUp
 
       </div>
 
-
+      
       { productType && productType != "" && productType.trim().length > 0 && productName &&  productName != "" && productName.trim().length > 0 ?   
           <div className='w-full'>
             <ul className="flex space-x-2 w-full p-4 justify-center item-center h-full flex-wrap gap-2">
@@ -1054,7 +1080,7 @@ const DynamicTable = ({ data, selectedCategoryKey, selectedCategoryValues, newUp
               <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={()=>setCheckboxValues([])}>
                 Tümünü Temizle
               </button>
-              <button className="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded" onClick={()=>sendData(productName, productType, selectedCategoryKey, selectedCategoryValues, checkboxValues)}>
+              <button className="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded" onClick={()=>sendData(productName, productType, productPrice, selectedCategoryKey, selectedCategoryValues, checkboxValues)}>
                 {newUpdateData ? "Ürünü Güncelle" : "Ürünü Kaydet"}
               </button>
             </div>

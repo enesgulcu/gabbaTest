@@ -490,13 +490,13 @@ import HandleImageClick from '@/functions/others/HandleImageClick';
                                   <div 
                                   className=" cursor-default absolute w-screen h-[1600px] max-h-screen lg:h-screen z-50 left-0 top-0 bg-black bg-opacity-90">
                                     <div className="relative top-0 left-0 w-screen h-screen z-20 flex justify-center items-center">
-                                      <div className="p-2 bg-white rounded-lg relative pt-10 lg:pt-2 flex justify-center items-center flex-col flex justify-center items-start lg:items-center flex-col">
+                                      <div className="p-2 bg-white rounded-lg relative pt-10 lg:pt-2 flex justify-center items-center flex-col ">
                                         <div
                                           onClick={async () => {
                                             await props.setFieldValue(`colors[${index}].colourPickerEnabled`,false);
                                             await props.setFieldValue(`colors[${index}].image`,"");
                                           }}
-                                          className="cursor-pointer hover:scale-105 hover:rotate-6 transition-all my-4 lg:absolute bg-red-600 p-2 lg:-right-10 -top-20 scale-125 lg:-top-10 rounded-full w-10 h-10 flex justify-center items-center text-center"
+                                          className="cursor-pointer hover:scale-105 hover:rotate-6 transition-all my-4  bg-red-600 p-2 lg:-right-10 -top-20 scale-125 lg:-top-10 rounded-full w-10 h-10 flex justify-center items-center text-center"
                                         >
                                           <IoClose color="white" size={40} />
                                         </div>

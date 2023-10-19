@@ -28,10 +28,10 @@ const ListComponent = ({NewData, setUpdateData, isloading, setIsloading }) => {
     
     // tablo verisi bu state üzerinde tutulmaktadır.
     const [measurements, setMeasurements] = useState([]);
-
+    
     useEffect(() => {
-
-      setMeasurements(NewData);
+    const sorted = [...NewData].sort((a, b) => parseInt(a.firstValue.match(/\d+/)) - parseInt(b.firstValue.match(/\d+/)));
+      setMeasurements(sorted);
     
     }, [NewData])
     
@@ -42,9 +42,10 @@ const ListComponent = ({NewData, setUpdateData, isloading, setIsloading }) => {
             if(responseData.status !== "success"){
                 throw new Error("Veri silinemedi");
             }
-            getData();
-            setIsloading(false);
+            
+            await setIsloading(false);
             toast.success("Veri başarıyla silindi");
+            await getData();
 
         } catch (error) {
             toast.error(error.message);
@@ -61,7 +62,9 @@ const ListComponent = ({NewData, setUpdateData, isloading, setIsloading }) => {
                 
                 throw new Error("Veri çekilemedi 1");
             }
-            setMeasurements(response.data);
+            // ölçülerin "firstValue" değerlerine göre küçükten büyüğe doğru sıraladık
+            const sorted = [...response.data].sort((a, b) => parseInt(a.firstValue.match(/\d+/)) - parseInt(b.firstValue.match(/\d+/)));
+            setMeasurements(sorted);
             
         } catch (error) {
             toast.error(error.message);

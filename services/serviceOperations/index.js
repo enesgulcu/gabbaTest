@@ -174,8 +174,6 @@ export async function findFirstFinancialManagement(tableName) {
       },
     });
 
-    console.log(result);
-
     if (result) {
       // En büyük değeri alıp +1 ekler.
       return (result.orderValue = result.orderValue + 1);
@@ -199,7 +197,7 @@ export async function findAndUpdateManyFinancialManagement(
         orderValue: desiredOrder,
       },
     });
-    console.log(desiredOrder);
+    
     // Kullanıcının istediği sıradan sonraki tüm verilere +1 ekleyin
     if (existingData) {
       const recordsToUpdate = await prisma[tableName].findMany({
