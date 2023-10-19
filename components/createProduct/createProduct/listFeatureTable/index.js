@@ -717,7 +717,7 @@ const renderFeaturesTable = () => {
               ))
             }
 
-            <th className=" text-xs md:text-md lg:text-lg text-center py-4 border-l border-white p-2 text-white bg-gray-700">İşlemler</th>
+            {/* <th className=" text-xs md:text-md lg:text-lg text-center py-4 border-l border-white p-2 text-white bg-gray-700">İşlemler</th> */}
           </tr>
         </thead>
 
@@ -749,15 +749,16 @@ const renderFeaturesTable = () => {
                 </td>
               ))}
 
-                  
-              <td className="text-center py-2 border-r border-b border-black">
-                <div className='flex flex-row justify-center items-center gap-2'>
-                                  {/* item -> özelliğin kendi verisini tutar*/}
-                  <button onClick={() => deleteProdcut({featureId:item.id, productId:selectedProduct.id}, "deleteFeature")} className='bg-red-600 rounded hover:cursor-pointer hover:scale-110 transition-all inline-block text-white font-bold text-md shadow p-2'>
-                    <FaTrash size={20} />
-                  </button>
-                </div>
-              </td>
+               {
+            //  <td className="text-center py-2 border-r border-b border-black">
+            //    <div className='flex flex-row justify-center items-center gap-2'>
+            //                      {/* item -> özelliğin kendi verisini tutar*/}
+            //      <button onClick={() => deleteProdcut({featureId:item.id, productId:selectedProduct.id}, "deleteFeature")} className='bg-red-600 rounded hover:cursor-pointer hover:scale-110 transition-all inline-block text-white font-bold text-md shadow p-2'>
+            //        <FaTrash size={20} />
+            //      </button>
+            //    </div>
+            //  </td>
+               }
             </tr>
           ))}
 
