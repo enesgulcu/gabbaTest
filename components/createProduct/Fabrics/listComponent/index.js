@@ -38,8 +38,9 @@ const ListComponent = ({NewData, setUpdateData, setNewData, isloading, setIsload
 
 
     useEffect(() => {
-
-      setFabrics(NewData);
+      console.log(NewData);
+      const sorted = [...NewData].sort((a, b) => a.fabricSwatch.localeCompare(b.fabricSwatch))
+      setFabrics(sorted); 
     
     }, [NewData])
     
@@ -70,8 +71,9 @@ const ListComponent = ({NewData, setUpdateData, setNewData, isloading, setIsload
                 
                 throw new Error("Veri çekilemedi 1");
             }
-            
-            setNewData(response.data);
+            const sorted = [response.data].sort((a, b) => a.fabricSwatch.localeCompare(b.fabricSwatch))
+            setNewData(sorted);
+
         } catch (error) {
             toast.error(error.message);
             console.log(error);

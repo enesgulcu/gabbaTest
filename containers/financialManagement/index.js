@@ -1,5 +1,5 @@
 import React from 'react';
-import FinancialManagementComponent from '@/components/createProduct/FinancialManagement';
+import FinancialManagementComponent from '@/components/FinancialManagement';
 
 const FinancialManagementContainer = async () => {
   return (

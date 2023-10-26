@@ -28,13 +28,14 @@ const ListComponent = ({NewData, setUpdateData, setNewData, isloading, setIsload
     
     // tablo verisi bu state üzerinde tutulmaktadır.
     const [colors, setColors] = useState([]);
-
-
+    console.log(NewData);
     useEffect(() => {
+      const sorted = [...NewData].sort((a, b) => a.colourType.localeCompare(b.colourType))
+      setColors(sorted);
+      
+      }, [NewData])
 
-      setColors(NewData);
-    
-    }, [NewData])
+
     
     // tablodan veri silme fonksiyonu
     const dataDeleteFunction = async (data) => {
@@ -63,8 +64,10 @@ const ListComponent = ({NewData, setUpdateData, setNewData, isloading, setIsload
                 
                 throw new Error("Veri çekilemedi 1");
             }
+
+            const sorted = [response.data].sort((a, b) => a.colourType.localeCompare(b.colourType))
+            setNewData(sorted);
             
-            setNewData(response.data);
         } catch (error) {
             toast.error(error.message);
             console.log(error);

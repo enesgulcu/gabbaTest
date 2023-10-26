@@ -1,16 +1,15 @@
-import '@/styles/globals.css'
-import { Inter } from 'next/font/google'
-import Navbar from "@/components/navbar";
+import '@/styles/globals.css';
+import { Inter } from 'next/font/google';
+import Navbar from '@/components/navbar';
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata = {
   title: 'Gabba Home',
   description: 'Gabba Home Design',
-}
+};
 
 export default function RootLayout({ children }) {
-
   const links = [
     { url: '/', text: 'Ana Sayfa' },
     {
@@ -23,7 +22,11 @@ export default function RootLayout({ children }) {
         { url: '/createProduct/colors', text: 'Renk Oluştur' },
       ],
     },
-    
+    {
+      url: '/financialManagement',
+      text: 'Finansal İşlemler',
+    },
+
     // {
     //   url: '/products',
     //   text: 'Products',
@@ -42,11 +45,11 @@ export default function RootLayout({ children }) {
   ];
 
   return (
-    <html lang="en">
+    <html lang='en'>
       <body className={inter.className}>
-        <Navbar links={links}/>
+        <Navbar links={links} />
         {children}
       </body>
     </html>
-  )
+  );
 }

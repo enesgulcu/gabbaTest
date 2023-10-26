@@ -13,9 +13,10 @@ import {postAPI, getAPI} from '@/services/fetchAPI';
 const DynamicTable = ({ data, selectedCategoryKey, selectedCategoryValues, newUpdateData, setIsUpdateEnabled }) => {
   const router = useRouter();
 
+
   const objectKey = Object.keys(data)[0];
   const responseData = data[objectKey];
-  
+
   //responseData içerisine yeni bir başlık ekle
   responseData["Extra"] = [
     {
@@ -102,6 +103,39 @@ const DynamicTable = ({ data, selectedCategoryKey, selectedCategoryValues, newUp
       imageValue10: "",
     }
   ];
+
+  // responseData içerisindeki tüm verilerin indexlerini hem numerik hem de alfabetik küçükten büyüğe doğru sıralama işlemi.
+  const reOrder = () =>{
+    if(objectKey === "furniture"){
+      Object.keys(responseData).forEach((item) => {
+        
+        responseData[item].forEach((item2) => {
+
+          if(item == "Ölçüler"){ //firstValue
+            // item değeri "Ölçüler" ise: firstValue değerlerini al ve küçükten büyüğe sırala.
+            responseData[item] = responseData[item].sort((a, b) => parseInt(a.firstValue.match(/\d+/)) - parseInt(b.firstValue.match(/\d+/)))
+          }
+
+          if(item == "Renkler"){ //colourType
+            // item değeri "Renkler" ise: colourType değerlerini al ve alfabetik olarak küçükten büyüğe doğru sırala.
+            responseData[item] = responseData[item].sort((a, b) => a.colourType.localeCompare(b.colourType))
+          }
+
+          if(item == "Kumaşlar"){ //fabricSwatch
+            // item değeri "Kumaşlar" ise: fabricSwatch değerlerini al ve alfabetik olarak küçükten büyüğe doğru sırala.
+            responseData[item] = responseData[item].sort((a, b) => a.fabricSwatch.localeCompare(b.fabricSwatch))
+          }
+
+          if(item == "Metaller"){ //metalType
+            // item değeri "Metaller" ise: metalType değerlerini al ve alfabetik olarak küçükten büyüğe doğru sırala.
+            responseData[item] = responseData[item].sort((a, b) => a.metalType.localeCompare(b.metalType))
+          }
+        })
+      });
+    }
+  }
+
+  reOrder();
 
 
   const [isloading, setIsloading] = useState(false);  
@@ -293,7 +327,7 @@ const DynamicTable = ({ data, selectedCategoryKey, selectedCategoryValues, newUp
   const returnExtraTargetValue = ( data, targetIndex, itemFeature ) => {
     // feature == Extra olanları içinden filtrele
     const filteredData = data.filter(item => item.feature === itemFeature);
-  
+
     // targetIndex'e göre veriyi bul
     const targetData = filteredData.find(item => item.index === targetIndex);
   
@@ -377,6 +411,7 @@ const DynamicTable = ({ data, selectedCategoryKey, selectedCategoryValues, newUp
       });
       return filteredItem;
     });
+
 
     const headerMappings = {
       // Ölçü

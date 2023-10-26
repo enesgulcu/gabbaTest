@@ -1,21 +1,19 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { toast } from 'react-toastify';
-import { getAPI, postAPI } from '@/services/fetchAPI';
-import FinancialManagementCalculate from '@/functions/others/financialManagementCalculate';
+import React, { useEffect } from 'react';
+import { postAPI } from '@/services/fetchAPI';
+import { IoCheckmarkDoneSharp, IoClose } from 'react-icons/io5';
 
 function ListFinancialComponent({
   filterOperationName,
   filterPriceType,
-  filterConditionStatus,
-  filterConditionType,
-  filterConditionValue,
-  filterConditionValue2,
   filterMathOperator,
   filterFinalPrice,
+  filterOrderValue,
   financialManagements,
   setFinancialManagement,
+  filteredFinancialManagements,
+  setFilteredFinancialManagements,
   isloading,
   setIsloading,
   getData,
@@ -25,17 +23,47 @@ function ListFinancialComponent({
   setCreateFinancialManagement,
   setFilterEnabled,
   setTestEnabled,
+  setShowSpecialFinancialManagement,
+  filterSpecialFinancialManagement,
+  financialManagementsSpecial,
 }) {
-  const [filteredData, setFilteredData] = useState([]); // filtrelenmiş veriler
+  useEffect(() => {
+    // Filtreleme işlemi
+    const filteredData = financialManagements.filter((item) => {
+      return (
+        item.operationName
+          .toLowerCase()
+          .includes(filterOperationName.toLowerCase()) &&
+        item.priceType.toLowerCase().includes(filterPriceType.toLowerCase()) &&
+        item.mathOperator
+          .toLowerCase()
+          .includes(filterMathOperator.toLowerCase()) &&
+        item.finalPrice
+          .toLowerCase()
+          .includes(filterFinalPrice.toLowerCase()) &&
+        item.orderValue
+          .toString()
+          .toLowerCase()
+          .includes(filterOrderValue.toString().toLowerCase())
+      );
+    });
 
-  useEffect(() => {}, []);
+    setFilteredFinancialManagements(filteredData);
+  }, [
+    filterOperationName,
+    filterPriceType,
+    filterMathOperator,
+    filterFinalPrice,
+    filterOrderValue,
+    financialManagements,
+  ]);
 
   // tablodan veri silme fonksiyonu
-  const dataDeleteFunction = async (id) => {
+  const dataDeleteFunction = async (selectedFinancialManagementData) => {
     try {
       setIsloading(true); // yükleniyor etkinleştirildi
       const responseData = await postAPI('/createProduct/financialManagement', {
-        data: id,
+        data: selectedFinancialManagementData,
         processType: 'delete',
       });
 
@@ -54,13 +82,13 @@ function ListFinancialComponent({
     const tableHeaders = [
       'sıra',
       'İşlem İsmi',
-      'Fiyat Tipi',
+      'Özel İşlem',
+      'Sorgulanacak Koşul',
       'Koşul Durumu',
       'Koşul Tipi',
       'Koşul Değeri',
-      'Koşul Değeri 2',
-      'Matematik Operatörü',
-      'Sonuç Değeri',
+      'Operatör',
+      'Uygulanan Değer',
       'İşlem Sırası',
       'İşlemler',
     ];
@@ -82,8 +110,8 @@ function ListFinancialComponent({
 
   const renderData = () => {
     return (
-      financialManagements.length > 0 &&
-      financialManagements.map((financialManagement, index) => (
+      filteredFinancialManagements.length > 0 &&
+      filteredFinancialManagements.map((financialManagement, index) => (
         <tr key={index} className='border-b'>
           <td className='border-r'>
             <div className='flex justify-center items-center h-full mt-2 w-full text-center py-2'>
@@ -92,27 +120,59 @@ function ListFinancialComponent({
               </div>
             </div>
           </td>
+
           <td className='text-center py-2 border-r'>
             <div>{financialManagement.operationName}</div>
+          </td>
+          <td className='text-center py-2 border-r flex justify-center items-center h-full px-2'>
+            {/* Eğer özel işlem var ise kontrol et. */}
+            {financialManagementsSpecial.filter(
+              (item) => item.financialManagementId === financialManagement.id
+            ).length > 0 ? (
+              <div className='flex center justify-center items-center gap-4'>
+                <button
+                  onClick={() => {
+                    // Özel işlemleri listelemek için
+                    setEditFinancialManagement(false);
+                    setCreateFinancialManagement(false);
+                    setFilterEnabled(false);
+                    setTestEnabled(false);
+                    setShowSpecialFinancialManagement(true);
+                    filterSpecialFinancialManagement(financialManagement.id);
+                  }}
+                  className='shadow-md bg-blue-500 hover:bg-blue-700 text-white font-bold p-2 rounded-md min-w-[50px]'
+                >
+                  Özel İşlemi Göster
+                </button>
+              </div>
+            ) : (
+              <div className='text-center py-2'>Özel İşlem Yok</div>
+            )}
           </td>
           <td className='text-center py-2 border-r'>
             <div>{financialManagement.priceType}</div>
           </td>
           <td className='text-center py-2 border-r'>
-            <div>
-              {financialManagement.condition
-                ? 'Koşul Olacak'
-                : 'Koşul Olmayacak'}
+            <div className='flex justify-center items-center'>
+              {financialManagement.condition ? (
+                <IoCheckmarkDoneSharp color='green' size={25} />
+              ) : (
+                <IoClose color='red' size={25} />
+              )}
             </div>
           </td>
           <td className='text-center py-2 border-r'>
             <div>{financialManagement.conditionType}</div>
           </td>
           <td className='text-center py-2 border-r'>
-            <div>{financialManagement.conditionValue}</div>
-          </td>
-          <td className='text-center py-2 border-r'>
-            <div>{financialManagement.conditionValue2}</div>
+            <div>
+              {financialManagement.conditionValue}{' '}
+              {financialManagement.conditionValue2 && (
+                <span>
+                  {'<>'} {financialManagement.conditionValue2}
+                </span>
+              )}
+            </div>
           </td>
           <td className='text-center py-2 border-r'>
             <div>{financialManagement.mathOperator}</div>
@@ -142,7 +202,7 @@ function ListFinancialComponent({
 
               <button
                 onClick={async () => {
-                  await dataDeleteFunction(financialManagement.id);
+                  await dataDeleteFunction(financialManagement);
                 }}
                 className='shadow-md bg-red-500 hover:bg-red-700 text-white font-bold p-2  rounded-md min-w-[50px]'
               >

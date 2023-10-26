@@ -7,6 +7,8 @@ import {
   deleteDataByMany,
   updateDataByAny,
   findAndUpdateManyFinancialManagement,
+  findAndUpdateAndDecreaseManyFinancialManagement,
+  updateOrderValueWhenChange,
 } from '@/services/serviceOperations';
 
 const handler = async (req, res) => {
@@ -18,29 +20,38 @@ const handler = async (req, res) => {
 
       // 1. SİLME İŞLEMİ
       if (data && processType == 'delete') {
+        // Veri silindikten sonra, order değerlerinin hepsini azaltıyoruz.
+        const decreaseData =
+          await findAndUpdateAndDecreaseManyFinancialManagement(
+            'financialManagement',
+            data.orderValue
+          );
+        // Silmek istenen veriyi kullanıcıdan id değerini alarak tablodan siliyoruz.
         const deleteData = await deleteDataByAny('financialManagement', {
-          id: data,
+          id: data.id,
         });
 
+        // Kontrol
         if (!deleteData || deleteData.error) {
           throw 'Bir hata oluştu. Lütfen teknik birimle iletişime geçiniz. XR07KY1';
         }
 
+        // Burada ise yukarıdaki işlemin sahip olduğu tüm "Özel İşlemler" verileri siliniyor.
         const deleteSpecialData = await deleteDataByMany(
           'financialManagementSpecial',
           {
-            financialManagementId: data,
+            financialManagementId: data.id,
           }
         );
 
+        // Kontrol
         if (!deleteSpecialData || deleteSpecialData.error) {
           throw deleteSpecialData;
         }
 
         return res.status(200).json({
           status: 'success',
-          data: deleteData,
-          message: deleteData.message,
+          message: 'İşlem başarılı',
         });
       }
 
@@ -70,19 +81,19 @@ const handler = async (req, res) => {
         // Eğer işlem sırası değişsin diyorsa, burası çalışır
         if (data.orderCondition) {
           // Gelen veriyi al ve işleme sok. Bu değerden büyük olan her işlem sırasının değerini 1 arttır.
-          const updatedData = await findAndUpdateManyFinancialManagement(
+          const updatedData = await updateOrderValueWhenChange(
             'financialManagement',
-            data.orderValue
+            data
           );
 
-          if (!updatedData || updatedData.error) {
+          if (updatedData.error) {
             throw 'Bir hata oluştu. Lütfen teknik birimle iletişime geçiniz. XR07KU1';
           }
         }
 
         delete data.orderCondition;
         delete data.financialManagementSpecial;
-
+        delete data.oldOrderValue;
         // Gelen verileri güncelliyoruz.
         const updateData = await updateDataByAny(
           'financialManagement',
@@ -109,7 +120,6 @@ const handler = async (req, res) => {
         }
 
         if (financialManagementSpecial) {
-          //console.log(financialManagementSpecial);
           financialManagementSpecial.forEach((item) => {
             item.financialManagementId = updateData.id;
           });
@@ -141,6 +151,7 @@ const handler = async (req, res) => {
         throw 'Bir hata oluştu. Lütfen teknik birimle iletişime geçiniz. XR09KY1';
       }
 
+      // 3. EKLEME İŞLEMİ
       // Eğer kullanıcı herhangi bir sıralama değeri yazarsa, aşağıdaki işlemler yapılacak
       if (data.orderCondition) {
         data.conditionValue = data.conditionValue.toString();
@@ -167,7 +178,6 @@ const handler = async (req, res) => {
         }
 
         if (financialManagementSpecial) {
-          //console.log(financialManagementSpecial);
           financialManagementSpecial.forEach((item) => {
             item.financialManagementId = createdNewData.id;
           });
@@ -205,7 +215,6 @@ const handler = async (req, res) => {
 
         // Ve burada işlem sırasını eklemiş oluyoruz. Otomatik artan bir değer.
         data.orderValue = maxOperationOrder;
-
         delete data.financialManagementSpecial;
 
         //Finansal Yönetim işlerini ekliyoruz.
@@ -215,8 +224,8 @@ const handler = async (req, res) => {
         }
 
         if (financialManagementSpecial) {
-          //console.log(financialManagementSpecial);
           financialManagementSpecial.forEach((item) => {
+            item.conditionValueSpecial = item.conditionValueSpecial.toString();
             item.financialManagementId = createdNewData.id;
           });
 
@@ -224,6 +233,10 @@ const handler = async (req, res) => {
             'financialManagementSpecial',
             financialManagementSpecial
           );
+
+          if (!createdData || createdData.error) {
+            throw 'Bir hata oluştu. Lütfen teknik birimle iletişime geçiniz. XR09KU6';
+          }
 
           return res.status(200).json({
             status: 'success',

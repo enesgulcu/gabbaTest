@@ -65,9 +65,9 @@ const ListFeatureTable = ({
   const [readyForListFeature, setReadyForListFeature] = useState([]); // ürün özelliklerini listelemek için hazır mıyız ?
   const [filteredData, setFilteredData] = useState([]); // filtrelenmiş veriler
 
-  const [selectedProductLanguage, setSelectedProductLanguage] = useState(""); // seçilen ürünün dili  
-  
+  const [selectedProductLanguage, setSelectedProductLanguage] = useState(""); // seçilen ürünün dili     
 
+  
   
   useEffect(() => {
     if(collectionUpdateEnabled && collectionUpdateProductData){
@@ -101,6 +101,9 @@ const ListFeatureTable = ({
         if(response.status !== "success"){
           throw new Error("Veri çekilemedi 1");
         }
+        
+        // response.data.createProducts içerisindeki değerleri gez ve "productName" değerlerine göre küçükten büyüğe doğru sırala.
+        await response.data.createProducts.sort((a, b) => a.productName.localeCompare(b.productName));
         
         setData(response.data);
         setIsloading(false);
@@ -174,7 +177,7 @@ useEffect(() => {
   });
 
   setFilteredData({ ...data, createProducts: filteredProducts });
-}, [data,filterProductCode, filterProductName, filterProductType, filterProductCategory]);
+}, [data, filterProductCode, filterProductName, filterProductType, filterProductCategory]);
 
 
 
@@ -267,7 +270,9 @@ const getProductFeatures = async (data, prodcutItem, updateStatus) => {
         }
       }
       await matchedFeatureOfProduct(prodcutItem, results, updateStatus);
+
       setAllFeatureData(results);
+
     }
 
     setIsloading(false);
@@ -325,7 +330,7 @@ const matchedFeatureOfProduct = async (prodcutItem, results, updateStatus) => {
 const prepareProductList = async (feature) => {
   
   setSelectedFeature(feature);
-  
+
   //feature ->  Ölçüler - Renkler - Ürünlar - Metaller - Extra - Image
   const readyForListData = [];
   await productFeatures.forEach((item) => {
@@ -347,7 +352,29 @@ const prepareProductList = async (feature) => {
     });
   });
 
-  setReadyForListFeature(readyForListData);
+  // verileri "isimlerine" ve "değerlerine" göre KÜÇÜKTEN BÜYÜĞE DOĞRU SIRALAR.
+  const sortedData = await readyForListData.sort((a, b) => {
+
+        if(a.firstValue && b.firstValue) {
+          return parseInt(a.firstValue.match(/\d+/)) - parseInt(b.firstValue.match(/\d+/))
+        }
+
+        else if (a.colourType && b.colourType) {
+          return a.colourType.localeCompare(b.colourType);
+        }
+
+        else if (a.metalType && b.metalType) {
+          return a.metalType.localeCompare(b.metalType);
+        }
+
+        else if(a.fabricType && b.fabricType){
+          return a.fabricType.localeCompare(b.fabricType);
+        }
+
+        return 0;
+      });
+    
+  setReadyForListFeature(sortedData);
 }
 
 const deleteProdcut = async (id, process) => {

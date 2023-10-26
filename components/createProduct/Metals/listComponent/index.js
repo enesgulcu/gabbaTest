@@ -31,8 +31,8 @@ const ListComponent = ({NewData, setUpdateData, setNewData, isloading, setIsload
 
 
     useEffect(() => {
-
-      setMetals(NewData);
+      const sorted = [...NewData].sort((a, b) => a.metalType.localeCompare(b.metalType))
+      setMetals(sorted);
     
     }, [NewData])
     
@@ -63,8 +63,9 @@ const ListComponent = ({NewData, setUpdateData, setNewData, isloading, setIsload
                 
                 throw new Error("Veri çekilemedi 1");
             }
-            
-            setNewData(response.data);
+            const sorted = [response.data].sort((a, b) => a.metalType.localeCompare(b.metalType))
+            setNewData(sorted);
+
         } catch (error) {
             toast.error(error.message);
             console.log(error);

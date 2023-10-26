@@ -5,7 +5,7 @@ const FinancialManagementValidationSchema = Yup.object().shape({
   priceType: Yup.string()
     .required('Fiyat türü boş bırakılamaz')
     .oneOf(
-      ['Liste Fiyatı', 'Liste Fiyatı x Adet Miktarı'],
+      ['Liste Fiyatı', 'Liste Fiyatı x Adet Miktarı', 'Önceki İşlem'],
       'Geçersiz bir fiyat türü seçtiniz'
     ),
   condition: Yup.boolean(),

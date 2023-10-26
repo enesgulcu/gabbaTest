@@ -197,7 +197,7 @@ export async function findAndUpdateManyFinancialManagement(
         orderValue: desiredOrder,
       },
     });
-    
+
     // Kullanıcının istediği sıradan sonraki tüm verilere +1 ekleyin
     if (existingData) {
       const recordsToUpdate = await prisma[tableName].findMany({
@@ -227,6 +227,95 @@ export async function findAndUpdateManyFinancialManagement(
   }
 }
 
+// Silme işleminde order değerini azaltmak için burası çalışır.
+export async function findAndUpdateAndDecreaseManyFinancialManagement(
+  tableName,
+  orderValue
+) {
+  try {
+    // Kullanıcının istediği sıradaki veriyi bulun
+    const existingData = await prisma[tableName].findFirst({
+      where: {
+        orderValue: orderValue,
+      },
+    });
+
+    // Kullanıcının istediği sıradan sonraki tüm verilere +1 ekleyin
+    if (existingData) {
+      const recordsToUpdate = await prisma[tableName].findMany({
+        where: {
+          orderValue: {
+            gte: orderValue,
+          },
+        },
+      });
+      for await (const record of recordsToUpdate) {
+        const currentOrder = parseInt(record.orderValue);
+        await prisma[tableName].update({
+          where: {
+            id: record.id,
+          },
+          data: {
+            orderValue: currentOrder - 1,
+          },
+        });
+      }
+      return existingData;
+    } else {
+      return 'Böyle bir veri bulunamadı.';
+    }
+  } catch (error) {
+    return { error: error.message };
+  }
+}
+
+export async function updateOrderValueWhenChange(tableName, data) {
+  try {
+    const existingData = await prisma[tableName].findFirst({
+      where: {
+        orderValue: data.oldOrderValue,
+      },
+    });
+
+    if (existingData) {
+      const recordsToUpdate = await prisma[tableName].findMany({
+        where: {
+          orderValue: {
+            gte: Math.min(data.oldOrderValue, data.orderValue),
+            lte: Math.max(data.oldOrderValue, data.orderValue),
+          },
+        },
+      });
+
+      for await (const record of recordsToUpdate) {
+        const currentOrder = parseInt(record.orderValue);
+        if (data.oldOrderValue <= data.orderValue) {
+          await prisma[tableName].update({
+            where: {
+              id: record.id,
+            },
+            data: {
+              orderValue: currentOrder - 1,
+            },
+          });
+        } else {
+          await prisma[tableName].update({
+            where: {
+              id: record.id,
+            },
+            data: {
+              orderValue: currentOrder + 1,
+            },
+          });
+        }
+      }
+
+      return recordsToUpdate;
+    }
+  } catch (error) {
+    return { error: error.message };
+  }
+}
 export default {
   getAllData,
 
@@ -259,4 +348,10 @@ export default {
 
   // Special Service
   findAndUpdateManyFinancialManagement,
+
+  // Special Service
+  findAndUpdateAndDecreaseManyFinancialManagement,
+
+  // Special Service
+  updateOrderValueWhenChange,
 };

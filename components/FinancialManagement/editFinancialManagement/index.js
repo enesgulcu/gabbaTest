@@ -19,9 +19,15 @@ function EditFinancialManagementComponent({
     financialManagementSpecialCondition,
     setFinancialManagementSpecialCondition,
   ] = useState(false);
+
   const filterSpecial = financialManagementsSpecial.filter(
     (item) => item.financialManagementId == editFinancialManagementData.id
   );
+
+  useEffect(() => {
+    filterSpecial.length > 0 && setFinancialManagementSpecialCondition(true);
+  }, []);
+
   return (
     <>
       <div className='border-4 border-purple-600 lg:rounded mt-2'>
@@ -59,6 +65,7 @@ function EditFinancialManagementComponent({
             conditionValue2: editFinancialManagementData.conditionValue2,
             mathOperator: editFinancialManagementData.mathOperator,
             finalPrice: editFinancialManagementData.finalPrice,
+            oldOrderValue: editFinancialManagementData.orderValue,
             orderCondition: false,
             orderValue: editFinancialManagementData.orderValue,
             financialManagementSpecial: filterSpecial.map((item) => ({
@@ -78,47 +85,43 @@ function EditFinancialManagementComponent({
                 ? false
                 : true;
 
-            // Liste Fiyatı x Adet Miktarı seçildiğinde koşul kontrolü sağlandı
-            if (values.priceType == 'Liste Fiyatı x Adet Miktarı') {
-              // Eğer kullanıcı Liste Fiyatı x Adet Miktarı seçiyorsa, koşul var demektir.
-              values.condition = true;
-
-              // Eğer kullanıcı koşul seçerse, koşul tipi ve koşul değeri girilmesi zorunlu hale geliyor.
-              if (values.conditionType == '') {
-                return toast.error(
-                  'Liste x Adet Miktarını seçtiniz. Koşul seçiniz.'
-                );
-              }
-              if (values.conditionType != '<>' && values.conditionValue == '') {
-                return toast.error(
-                  'Liste x Adet Miktarını seçtiniz. Koşul değeri giriniz.'
-                );
-              }
-              if (values.conditionType == '<>') {
-                if (
-                  values.conditionValue == '' ||
-                  values.conditionValue2 == ''
-                ) {
-                  toast.error(
-                    'Liste x Adet Miktarını seçtiniz. Koşul değerlerini giriniz.'
-                  );
-                }
-                if (values.conditionValue > values.conditionValue2) {
-                  toast.error('İlk değer ikinci değerden büyük olamaz!');
-                }
-              }
-            } else {
-              // Eğer Liste Fiyatı seçildiyse, koşul durumu false durumuna getiriliyor.
-              values.condition = false;
+            if (!financialManagementSpecialCondition) {
+              values.financialManagementSpecial = [
+                {
+                  mathOperatorSpecial: '',
+                  conditionValueSpecial: '',
+                  ozelBaremValue: 0,
+                },
+              ];
             }
 
+            if (values.conditionType != '') {
+              if (values.conditionValue.length <= 0) {
+                return toast.error('Koşul değerini giriniz!');
+              }
+            }
+
+            if (values.conditionType == '<>') {
+              if (
+                values.conditionValue.length <= 0 ||
+                values.conditionValue2.length <= 0
+              ) {
+                return toast.error('Koşul değerlerini giriniz.');
+              }
+              if (values.conditionValue >= values.conditionValue2) {
+                return toast.error(
+                  'İlk değer ikinci değere eşit ya da büyük olamaz!'
+                );
+              }
+            }
+
+            // Özel işlemde hata mesajını yazdırmak için ufak bir obje oluşturuyoruz.
             let isError = { status: false, message: '' };
             // Özel işlem için kontrol yeri
             financialManagementSpecialCondition &&
               values.financialManagementSpecial.forEach((item, index) => {
                 if (
                   item.mathOperatorSpecial == '' ||
-                  item.conditionValueSpecial == orderLength ||
                   (item.conditionValueSpecial == 'Özel Barem Ekle' &&
                     item.ozelBaremValue == 0)
                 ) {
@@ -129,12 +132,21 @@ function EditFinancialManagementComponent({
                 }
               });
 
+            // Eğer koşul ekleme işlemi false ise, koşul değerlerini sıfırlıyoruz.
+            if (!values.condition) {
+              values.conditionType = '';
+              values.conditionValue = '';
+              values.conditionValue2 = '';
+            }
+
+            // Özel işlemden aldığımız hatayı kullanıcıya gösteriyoruz.
             if (isError.status) {
               return toast.error(isError.message);
             }
 
             setIsloading(true);
-            //console.log(value);
+
+            //API'ye verilerimizi gönderiyoruz.
             const response = await postAPI(
               '/createProduct/financialManagement',
               {
@@ -147,13 +159,14 @@ function EditFinancialManagementComponent({
               setIsloading(false);
               toast.error(response.error);
             } else {
-              // veriyi çek ve state'e at
+              // Eğer veriyi başarıyla çekersek
+              // state'deki verileri güncellemek için fonksiyonumuzu tekrar çağırıyoruz.
               getData();
               setIsloading(false);
-              resetForm({ values: '' });
-              setOrderLengthState(orderLengthState + 1);
+              resetForm({ values: '' }); // Formdaki verileri sıfırlıyoruz.
+              setOrderLengthState(orderLengthState + 1); // Ekleme işlemi olduğu için lenght değerini arttıyoruz.
               toast.success('Tüm Veriler Başarıyla Güncellendi!');
-              setEditFinancialManagement(false);
+              setEditFinancialManagement(false); // Edit modunu kapatıyoruz.
             }
           }}
         >
@@ -240,15 +253,15 @@ function EditFinancialManagementComponent({
                           className='field-error text-red-600 m-1'
                         />
                       )}
+
                       <p className='font-semibold text-center whitespace-nowrap mt-2'>
-                        {`${props.values.priceType}'na ${
-                          props.values.mathOperator
-                        }${
-                          props.values.finalPrice &&
-                          props.values.finalPrice != undefined
-                            ? props.values.finalPrice
-                            : '0'
-                        } işlemini uygula`}
+                        {`${
+                          props.values.orderValue == 1
+                            ? ''
+                            : props.values.orderValue - 1 + '. '
+                        }İşlem Sonucuna ${props.values.mathOperator}${
+                          props.values.finalPrice
+                        } İşlemini Uygula`}
                       </p>
                     </div>
                   )}
@@ -274,8 +287,8 @@ function EditFinancialManagementComponent({
                             } text-white rounded p-1 font-semibold`}
                           >
                             {props.values.condition
-                              ? 'Koşulu Kapat (x)'
-                              : 'Koşulu Düzenle (+)'}
+                              ? 'Koşulu Kaldır (x)'
+                              : 'Koşul Ekle (+)'}
                           </button>
                           <button
                             onClick={
@@ -337,6 +350,12 @@ function EditFinancialManagementComponent({
                           <option value='Liste Fiyatı x Adet Miktarı'>
                             Liste Fiyatı x Adet Miktarı
                           </option>
+
+                          {props.values.orderValue != 1 && (
+                            <option value='Önceki İşlem'>
+                              Önceki İşlem Sonucu
+                            </option>
+                          )}
                         </select>
                         <ErrorMessage
                           name='priceType'
@@ -604,10 +623,10 @@ function EditFinancialManagementComponent({
                                 </Field>
                                 {props.values.financialManagementSpecial[index]
                                   .mathOperatorSpecial && (
-                                  <Field
+                                  <select
+                                    onChange={props.handleChange}
                                     className='border text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 bg-gray-700 border-gray-600 placeholder-gray-400'
                                     name={`financialManagementSpecial[${index}].conditionValueSpecial`}
-                                    as='select'
                                     value={
                                       props.values.financialManagementSpecial[
                                         index
@@ -615,21 +634,20 @@ function EditFinancialManagementComponent({
                                     }
                                   >
                                     <option
-                                      value={`${
-                                        props.values.orderValue
-                                          ? props.values.orderValue - 1
-                                          : orderLength - 1
-                                      }`}
+                                      value={
+                                        index > 0
+                                          ? index + '. Özel İşlemin Sonucu'
+                                          : orderLength - 1 + '. İşlemin Sonucu'
+                                      }
                                     >
-                                      {props.values.orderValue
-                                        ? props.values.orderValue - 1
-                                        : orderLength - 1}
-                                      . İşlemin Sonucu
+                                      {index > 0
+                                        ? index + '. Özel İşlemin Sonucu'
+                                        : orderLength - 1 + '. İşlemin Sonucu'}
                                     </option>
                                     <option value='Özel Barem Ekle'>
                                       Özel Barem Ekle
                                     </option>
-                                  </Field>
+                                  </select>
                                 )}
                                 {props.values.financialManagementSpecial[index]
                                   .conditionValueSpecial ==
@@ -665,10 +683,11 @@ function EditFinancialManagementComponent({
                                   ].conditionValueSpecial == 'Özel Barem Ekle'
                                     ? `${props.values.financialManagementSpecial[index].ozelBaremValue}`
                                     : ` ${
-                                        props.values.orderValue
-                                          ? props.values.orderValue - 1
-                                          : orderLength - 1
-                                      }. İşlemin Sonucu`}
+                                        index > 0
+                                          ? index + '. Özel İşlemin Sonucu'
+                                          : props.values.orderValue +
+                                            '. İşlemin Sonucu'
+                                      }`}
                                 </p>
                                 <button
                                   className='bg-red-600 hover:bg-red-500 text-white rounded p-3'
@@ -686,7 +705,9 @@ function EditFinancialManagementComponent({
                             onClick={() =>
                               push({
                                 mathOperatorSpecial: '',
-                                conditionValueSpecial: orderLength.toString(),
+                                conditionValueSpecial:
+                                  props.values.financialManagementSpecial
+                                    .length + '. Özel İşlemin Sonucu',
                                 ozelBaremValue: 0,
                               })
                             }
