@@ -62,11 +62,11 @@ const FinancialManagementComponent = () => {
   const getData = async () => {
     try {
       setIsloading(true);
-      const response = await getAPI('/createProduct/financialManagement');
+      const response = await getAPI('/financialManagement');
       // İşlem sırasına göre düzeltiyoruz. Veritabanında sırasız bir şekilde tutuluyor.
       response.data.sort((a, b) => a.orderValue - b.orderValue);
       const responseSpecial = await getAPI(
-        '/createProduct/financialManagementSpecial'
+        '/financialManagementSpecial'
       );
       setFinancialManagementsSpecial(responseSpecial.data);
       if (!response || !responseSpecial) {

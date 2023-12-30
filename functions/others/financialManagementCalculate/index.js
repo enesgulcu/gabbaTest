@@ -94,11 +94,9 @@ const specialCalculateOperation = (
 };
 
 const FinancialManagementCalculate = async (price, stock) => {
-  const response = await getAPI('/createProduct/financialManagement');
+  const response = await getAPI('/financialManagement');
   response.data.sort((a, b) => a.orderValue - b.orderValue);
-  const responseSpecial = await getAPI(
-    '/createProduct/financialManagementSpecial'
-  );
+  const responseSpecial = await getAPI('/financialManagementSpecial');
   let result = [];
   let special = [];
 

@@ -148,7 +148,7 @@ function EditFinancialManagementComponent({
 
             //API'ye verilerimizi gönderiyoruz.
             const response = await postAPI(
-              '/createProduct/financialManagement',
+              '/financialManagement',
               {
                 data: values,
                 processType: 'update',

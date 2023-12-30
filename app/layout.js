@@ -26,6 +26,10 @@ export default function RootLayout({ children }) {
       url: '/financialManagement',
       text: 'Finansal İşlemler',
     },
+    {
+      url: '/createOffer',
+      text: 'Teklif Oluştur',
+    },
 
     // {
     //   url: '/products',

@@ -99,9 +99,8 @@ model Colors {
   colourDescriptionTurkish   String?
   colourDescriptionUkrainian String?
   colourDescriptionEnglish   String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt                  DateTime @default(now())
+  updatedAt                  DateTime @updatedAt
 }
 
 model Products {
@@ -184,7 +183,6 @@ model CollectionImages {
   collectionImage String?
 }
 
-// Eklenen
 model FinancialManagement {
   id              String   @id @default(auto()) @map("_id") @db.ObjectId
   operationName   String
@@ -200,7 +198,6 @@ model FinancialManagement {
   updatedAt       DateTime @updatedAt
 }
 
-// Eklenen
 model FinancialManagementSpecial {
   id                    String   @id @default(auto()) @map("_id") @db.ObjectId
   financialManagementId String
@@ -209,4 +206,143 @@ model FinancialManagementSpecial {
   ozelBaremValue        Int
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
+}
+
+model OfferBasketColors {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  colourId  String
+  productId String
+  basketId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model OfferBasketFabrics {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  fabricsId String
+  productId String
+  basketId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model OfferBasketMetals {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  metalId   String
+  productId String
+  basketId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model OfferBasketMeasurements {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  measurementId String
+  productId     String
+  basketId      String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model OfferBasketExtra {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  extraId   String
+  productId String
+  basketId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model User {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  companyName  String?
+  name         String
+  surname      String
+  phoneNumber  String
+  address      String?
+  mailAddress  String?  @unique
+  storeName    String?
+  storeAddress String?
+  role         String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model OfferBasket {
+  id                  String  @id @default(auto()) @map("_id") @db.ObjectId
+  stock               Int
+  orderNote           String?
+  productId           String
+  productPrice        Float
+  productFeaturePrice Float
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model OfferOrder {
+  id                  String   @id @default(auto()) @map("_id") @db.ObjectId
+  customerId          String
+  personelId          String
+  orderCode           String
+  invalidDate         DateTime
+  stock               Int
+  orderNote           String?
+  ordersStatus        String
+  productOrderStatus  String
+  productId           String
+  productPrice        Float
+  productFeaturePrice Float
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+model OfferOrderColors {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  colourId  String
+  orderId   String
+  productId String
+  orderCode String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model OfferOrderMetals {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  metalId   String
+  orderId   String
+  productId String
+  orderCode String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model OfferOrderMeasurements {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  measurementId String
+  orderId       String
+  productId     String
+  orderCode     String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model OfferOrderFabrics {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  fabricsId String
+  orderId   String
+  productId String
+  orderCode String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model OfferOrderExtra {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  extraId   String
+  orderId   String
+  productId String
+  orderCode String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

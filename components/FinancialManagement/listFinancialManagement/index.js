@@ -62,7 +62,7 @@ function ListFinancialComponent({
   const dataDeleteFunction = async (selectedFinancialManagementData) => {
     try {
       setIsloading(true); // yükleniyor etkinleştirildi
-      const responseData = await postAPI('/createProduct/financialManagement', {
+      const responseData = await postAPI('/financialManagement', {
         data: selectedFinancialManagementData,
         processType: 'delete',
       });

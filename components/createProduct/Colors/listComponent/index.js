@@ -28,7 +28,7 @@ const ListComponent = ({NewData, setUpdateData, setNewData, isloading, setIsload
     
     // tablo verisi bu state üzerinde tutulmaktadır.
     const [colors, setColors] = useState([]);
-    console.log(NewData);
+
     useEffect(() => {
       const sorted = [...NewData].sort((a, b) => a.colourType.localeCompare(b.colourType))
       setColors(sorted);

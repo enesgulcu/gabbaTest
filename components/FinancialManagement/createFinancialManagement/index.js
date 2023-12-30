@@ -109,7 +109,7 @@ const CreateFinancialManagementComponent = ({
           }
 
           setIsloading(true);
-          const response = await postAPI('/createProduct/financialManagement', {
+          const response = await postAPI('/financialManagement', {
             data: values,
           });
 
