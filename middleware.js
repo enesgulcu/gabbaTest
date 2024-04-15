@@ -23,7 +23,7 @@ export default withAuth(async function middleware(req) {
   const currentPath = req.nextUrl.pathname;
   if (!session) {
     // Kullanıcının giriş yapıp yapmadığını kontrol ediyoruz.
-    return NextResponse.redirect(${process.env.NEXTAUTH_URL}/sign-in);
+    return NextResponse.redirect(`${process.env.NEXTAUTH_URL}/sign-in`);
   }
 
   // // Eğer rolü manager ise ama sayfaya erişimi yoksa dashboard'a yönlendiriyoruz.
