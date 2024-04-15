@@ -29,18 +29,18 @@ export default withAuth(async function middleware(req) {
   // // Eğer rolü manager ise ama sayfaya erişimi yoksa dashboard'a yönlendiriyoruz.
   // if (
   //   session.user.role == 'manager' &&
-  //   !allowedManagerPaths.some((path) => currentPath === /${path})
+  //   !allowedManagerPaths.some((path) => currentPath === `/${path}`)
   // ) {
-  //   return NextResponse.redirect(${process.env.NEXTAUTH_URL}/dashboard);
+  //   return NextResponse.redirect(`${process.env.NEXTAUTH_URL}/dashboard`);
   // }
 
   // // Eğer rolü personal ise ama sayfaya erişimi yoksa dashboard'a yönlendiriyoruz.
   // if (
   //   (session.user.role =
   //     'personal' &&
-  //     !allowedPersonalPaths.some((path) => currentPath === /${path}))
+  //     !allowedPersonalPaths.some((path) => currentPath === `/${path}`))
   // ) {
-  //   return NextResponse.redirect(${process.env.NEXTAUTH_URL}/dashboard);
+  //   return NextResponse.redirect(`${process.env.NEXTAUTH_URL}/dashboard`);
   // }
 });
 

@@ -78,8 +78,6 @@ const MainLayout = ({ children }) => {
 
   const { data } = useSession();
 
-  console.log(data);
-
   return (
     <LoadingContext.Provider value={{ isLoading, setIsLoading }}>
       <div className="flex h-screen w-full overflow-hidden bg-background pb-4 relative">

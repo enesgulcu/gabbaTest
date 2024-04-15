@@ -538,7 +538,7 @@ const DynamicTable = ({
               <th className='p-3 text-white bg-red-600 font-bold border-l border-white'>
                 - Ücret
               </th>
-              {Object.keys(filteredData[0]).map(
+              {filteredData[0] && Object.keys(filteredData[0]).map(
                 (header) =>
                   // tablo başlıklarının listelendiği bölüm
                   header != 'id' && (

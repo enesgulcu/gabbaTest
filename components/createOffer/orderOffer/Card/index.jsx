@@ -132,9 +132,9 @@ const Card = ({
                     />
                   </Link>
 
-                  {/* <Button>
-                    <Link href={`/stepbystep/${item.orderCode}`}>Go Panel</Link>
-                  </Button> */}
+                  <Button>
+                    <Link href={`/stepbystep/${item.orderCode}/1.1`}>Go Panel</Link>
+                  </Button>
                 </div>
               </div>
             </div>

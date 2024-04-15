@@ -11,12 +11,12 @@ const MainLayout = ({ children }) => {
       buttons: [
         {
           id: '1.1',
-          label: '1.1 Adım',
+          label: 'Fişi Gör Veya Gönder',
           path: `/stepbystep/${id}/1.1`
         },
         {
           id: '1.2',
-          label: 'Fişi Gör Veya Gönder',
+          label: '1.2 adım',
           path: `/stepbystep/${id}/1.2`
         },
         {

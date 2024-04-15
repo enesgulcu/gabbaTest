@@ -9,6 +9,7 @@ import ButtonList from '@/components/dashboard/ButtonList';
 import UserIcon from '@/assets/icons/UserIcon';
 import BurgerIcon from '@/assets/icons/BurgerIcon';
 import { useMediaQuery } from '@/lib/table/useMediaQuery';
+import { useSession } from 'next-auth/react';
 
 const Sidebar = ({ buttons }) => {
   const pathname = usePathname();
@@ -92,6 +93,8 @@ const Sidebar = ({ buttons }) => {
     }
   };
 
+  const { data } = useSession()
+
   return (
     <>
       <aside
@@ -136,6 +139,31 @@ const Sidebar = ({ buttons }) => {
               <ButtonList buttons={x} level={1} />
             </div>
           ))}
+
+          {data?.user && (
+            <div
+              className={classNames("flex flex-col p-4 h-fit gap-4 rounded fixed bottom-4 right-4 text-sm font-medium bg-muted-foreground", "cursor-pointer group", "transition-all duration-200 ease-in-out")}
+            >
+              <div className="flex items-end border-b border-muted/50 gap-2">
+                <span className={classNames("text-muted/80 text-sm font-bold")}>
+                  Name:
+                </span>
+                <span className={classNames("text-muted/90 text-sm font-medium")}>
+                  {data.user.name}
+                  {" "}
+                  {data.user.surname}
+                </span>
+              </div>
+              <div className="flex items-end border-b border-muted/50 gap-2">
+                <span className={classNames("text-muted/80 text-sm font-bold")}>
+                  Role:
+                </span>
+                <span className={classNames("text-muted/90 text-sm font-medium")}>
+                  {data.user.role}
+                </span>
+              </div>
+            </div>
+          )}
         </div>
         {!isCollapsed && (
           <div

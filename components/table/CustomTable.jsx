@@ -81,7 +81,7 @@ const CustomTable = ({
 }) => {
   // next-auth kurulunca güncellenecek
   const { data: session } = useSession();
-  const role = session?.user?.role;
+  const role = session?.user?.role ?? "company_manager";
   {
     /* Stateler */
   }
@@ -901,7 +901,7 @@ const CustomTable = ({
                         {col?.engine === "prisma" ? (
                           <>
                             {
-                              dt[col?.table?.toLowerCase()][col?.selectableField]
+                              dt[col?.table?.toLowerCase()] && dt[col?.table?.toLowerCase()][col?.selectableField] && dt[col?.table?.toLowerCase()][col?.selectableField]
                             }
                           </>
                         ) : (

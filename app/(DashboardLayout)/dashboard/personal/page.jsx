@@ -8,7 +8,7 @@ import { useSession } from 'next-auth/react';
 const Addperson = () => {
   // next-auth kurulunca güncellenecek
   const { data } = useSession()
-  const role = data.user.role
+  const role = data?.user?.role ?? "company_manager"
   return (
     <div>
       <CustomTable
