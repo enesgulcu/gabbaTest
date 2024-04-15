@@ -42,12 +42,16 @@ const handleDelete = async (req) => {
 const handler = async (req, res) => {
   try {
     if (req.method === "GET") {
-      const financialManagementSpecial = await prisma["Store"].findMany({
-        where: {},
-        include: {
-          company: true,
-        },
-      });
+      // const financialManagementSpecial = await prisma["Store"].findMany({
+      //   where: {},
+      //   include: {
+      //     company: true,
+      //   },
+      // });
+
+      const financialManagementSpecial = await getAllData("store");
+
+      console.log(financialManagementSpecial);
       
       if (!financialManagementSpecial || financialManagementSpecial.error) {
         throw "Bir hata oluştu. Lütfen teknik birimle iletişime geçiniz. XR09KY4";
