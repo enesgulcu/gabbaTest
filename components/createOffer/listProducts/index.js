@@ -108,6 +108,7 @@ function ListProducts({
   }
 
   useEffect(() => {
+    console.log(products)
     getAllFeatureValues();
   }, []);
 
