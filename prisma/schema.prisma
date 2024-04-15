@@ -254,18 +254,55 @@ model OfferBasketExtra {
 }
 
 model User {
-  id           String   @id @default(auto()) @map("_id") @db.ObjectId
-  companyName  String?
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  companyName String?
+
+  name          String?
+  nameEnglish   String?
+  nameUkrainian String?
+  nameTurkish   String?
+
+  surname          String?
+  surnameEnglish   String?
+  surnameUkrainian String?
+  surnameTurkish   String?
+
+  phoneNumber String @unique
+
+  address          String?
+  addressEnglish   String?
+  addressUkrainian String?
+  addressTurkish   String?
+
+  mailAddress String? @unique
+
+  store   Store?  @relation(fields: [storeId], references: [id])
+  storeId String? @unique @map("storeId") @db.ObjectId
+
+  maxTax String?
+  role   String?
+  salary String?
+  bonus  String?
+
+  managerComment          String?
+  managerCommentEnglish   String?
+  managerCommentUkrainian String?
+  managerCommentTurkish   String?
+
+  password String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Customer {
+  id           String @id @default(auto()) @map("_id") @db.ObjectId
   name         String
   surname      String
-  phoneNumber  String
-  address      String?
-  mailAddress  String?  @unique
-  storeName    String?
-  storeAddress String?
-  role         String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  mailAddress  String @unique
+  address      String
+  company_name String
+  phoneNumber  String @unique
 }
 
 model OfferBasket {
@@ -345,4 +382,215 @@ model OfferOrderExtra {
   orderCode String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Store {
+  id            String  @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  nameEnglish   String?
+  nameUkrainian String?
+  nameTurkish   String?
+
+  company   Company? @relation(fields: [companyId], references: [id])
+  companyId String?  @unique @map("companyId") @db.ObjectId
+
+  country          String
+  countryEnglish   String?
+  countryUkrainian String?
+  countryTurkish   String?
+
+  state          String
+  stateEnglish   String?
+  stateUkrainian String?
+  stateTurkish   String?
+
+  phone_number String
+
+  maximum_discount_rate String
+  maximum_bonus_rate    String
+
+  description          String
+  descriptionEnglish   String?
+  descriptionUkrainian String?
+  descriptionTurkish   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  User      User[]
+}
+
+model Company {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  name String @unique
+
+  yetkili String
+
+  tel1 String
+  tel2 String
+
+  email1 String
+  email2 String
+
+  address          String
+  addressEnglish   String?
+  addressUkrainian String?
+  addressTurkish   String?
+
+  vergino      String
+  banka        String
+  bankahesapno String
+  bankamfo     String
+  iban         String
+
+  ekstra1          String
+  ekstra1English   String?
+  ekstra1Ukrainian String?
+  ekstra1Turkish   String?
+
+  ekstra2          String
+  ekstra2English   String?
+  ekstra2Ukrainian String?
+  ekstra2Turkish   String?
+
+  ekstra3          String
+  ekstra3English   String?
+  ekstra3Ukrainian String?
+  ekstra3Turkish   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Store     Store?
+}
+
+model Expense {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  store String
+
+  payment_company_info          String
+  payment_company_infoEnglish   String?
+  payment_company_infoUkrainian String?
+  payment_company_infoTurkish   String?
+
+  date String
+
+  payment_type String
+
+  expense_name          String
+  expense_nameEnglish   String?
+  expense_nameUkrainian String?
+  expense_nameTurkish   String?
+
+  currency          String
+  currencyEnglish   String?
+  currencyUkrainian String?
+  currencyTurkish   String?
+
+  exchange_rate          String
+  exchange_rateEnglish   String?
+  exchange_rateUkrainian String?
+  exchange_rateTurkish   String?
+
+  expense_amount          String
+  expense_amountEnglish   String?
+  expense_amountUkrainian String?
+  expense_amountTurkish   String?
+
+  description          String
+  descriptionEnglish   String?
+  descriptionUkrainian String?
+  descriptionTurkish   String?
+}
+
+model Stock {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  stock Int
+
+  orderNote           String?
+  productId           String
+  storeId             String
+  productPrice        Float
+  productFeaturePrice Float
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model StockColors {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  colourId  String
+  productId String
+  stockId   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model StockFabrics {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  fabricsId String
+  productId String
+  stockId   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model StockMetals {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  metalId   String
+  productId String
+  stockId   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model StockMeasurements {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  measurementId String
+  productId     String
+  stockId       String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model StockExtra {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  extraId   String
+  productId String
+  stockId   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Supplier {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  yetkiliisim1          String
+  yetkiliisim1English   String?
+  yetkiliisim1Ukrainian String?
+  yetkiliisim1Turkish   String?
+
+  yetkilitelefon1 String?
+  yetkiliemail1   String?
+
+  yetkiliisim2          String
+  yetkiliisim2English   String?
+  yetkiliisim2Ukrainian String?
+  yetkiliisim2Turkish   String?
+
+  yetkilitelefon2 String?
+  yetkiliemail2   String?
+
+  firma          String
+  firmaEnglish   String?
+  firmaUkrainian String?
+  firmaTurkish   String?
+
+  adres          String
+  adresEnglish   String?
+  adresUkrainian String?
+  adresTurkish   String?
+
+  vergino     String?
+  sirkettel   String?
+  sirketemail String?
 }

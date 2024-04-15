@@ -11,7 +11,6 @@ function ListProducts({
   isloading,
   setIsloading,
   getData,
-  getAllBasketData,
   products,
   productFeatures,
   setHiddenBasketBar,
@@ -266,15 +265,14 @@ function ListProducts({
     } // else {
     //   console.log('Belirtilen kategori bulunamadı.');
     // }
-    console.log(props.values.selectedOfferFeatures);
   };
 
   const deleteOfferedFeatures = (item, category, props) => {
     const id = item.id;
     item.targetValue === 'plus' || item.targetValue === 'minus'
       ? setProductFeaturePrice(
-          parseInt(productFeaturePrice) - parseInt(item.value)
-        )
+        parseInt(productFeaturePrice) - parseInt(item.value)
+      )
       : null;
     // Objeyi kategoriden kaldırmak için bir işlev
     if (props.values.selectedOfferFeatures[category]) {
@@ -332,6 +330,10 @@ function ListProducts({
             }}
             onSubmit={async (values, { resetForm }) => {
               setIsloading(true);
+              setSelectedProduct(null);
+              setSelectedFeatures(null);
+              setSelectedCategory(null);
+              setHiddenBasketBar(false);
               if (values.stock <= 0) {
                 setIsloading(false);
                 return toast.error('Lütfen geçerli bir adet giriniz.');
@@ -365,7 +367,7 @@ function ListProducts({
                 setSelectedProduct(null);
                 setSelectedFeatures(null);
                 setSelectedCategory(null);
-                getAllBasketData();
+                getData('onlyBasket');
               }
             }}
           >
@@ -499,11 +501,10 @@ function ListProducts({
                                 setSelectedCategory(key);
                                 filterFeatures();
                               }}
-                              className={`${
-                                key == selectedCategory
-                                  ? 'bg-blue-500 text-white'
-                                  : 'bg-gray-200'
-                              } hover:scale-105 transition-all rounded-md p-2 w-full m-2]`}
+                              className={`${key == selectedCategory
+                                ? 'bg-blue-500 text-white'
+                                : 'bg-gray-200'
+                                } hover:scale-105 transition-all rounded-md p-2 w-full m-2]`}
                             >
                               {key}
                             </button>
@@ -571,416 +572,401 @@ function ListProducts({
                         <tbody>
                           {test && selectedCategory == 'Renkler'
                             ? test['Renkler'].map((item, index) => (
-                                <tr
-                                  key={index}
-                                  className={`${
-                                    selectedCategory == 'Renkler'
-                                      ? 'table-row border-b'
-                                      : 'hidden'
+                              <tr
+                                key={index}
+                                className={`${selectedCategory == 'Renkler'
+                                  ? 'table-row border-b'
+                                  : 'hidden'
                                   } `}
-                                >
-                                  <td className='text-center py-2 border-r'>
-                                    <button
-                                      onClick={() =>
-                                        props.values.selectedOfferFeatures.Renkler.filter(
-                                          (feature) => feature.id === item.id
-                                        ).length > 0
-                                          ? deleteOfferedFeatures(
-                                              item,
-                                              'Renkler',
-                                              props
-                                            )
-                                          : addOfferedFeatures(
-                                              item,
-                                              'Renkler',
-                                              props
-                                            )
-                                      }
-                                      type='button'
-                                      className={`${
-                                        props.values.selectedOfferFeatures.Renkler.filter(
-                                          (feature) => feature.id === item.id
-                                        ).length > 0
-                                          ? 'bg-red-500'
-                                          : 'bg-blue-500'
+                              >
+                                <td className='text-center py-2 border-r'>
+                                  <button
+                                    onClick={() =>
+                                      props.values.selectedOfferFeatures.Renkler.filter(
+                                        (feature) => feature.id === item.id
+                                      ).length > 0
+                                        ? deleteOfferedFeatures(
+                                          item,
+                                          'Renkler',
+                                          props
+                                        )
+                                        : addOfferedFeatures(
+                                          item,
+                                          'Renkler',
+                                          props
+                                        )
+                                    }
+                                    type='button'
+                                    className={`${props.values.selectedOfferFeatures.Renkler.filter(
+                                      (feature) => feature.id === item.id
+                                    ).length > 0
+                                      ? 'bg-red-500'
+                                      : 'bg-blue-500'
                                       } rounded hover:cursor-pointer hover:scale-110 transition-all inline-block text-white font-bold text-md shadow`}
-                                    >
-                                      <div className='p-2 flex flex-row justify-center items-center gap-2 whitespace-nowrap'>
-                                        <span className='block'>
-                                          {props.values.selectedOfferFeatures.Renkler.filter(
-                                            (feature) => feature.id === item.id
-                                          ).length > 0
-                                            ? 'Özelliği Kaldır'
-                                            : 'Özelliği Ekle'}
-                                        </span>
-                                      </div>
-                                    </button>
-                                  </td>
-                                  <td className='text-center py-2 border-r'>
-                                    {item.colourType}
-                                  </td>
+                                  >
+                                    <div className='p-2 flex flex-row justify-center items-center gap-2 whitespace-nowrap'>
+                                      <span className='block'>
+                                        {props.values.selectedOfferFeatures.Renkler.filter(
+                                          (feature) => feature.id === item.id
+                                        ).length > 0
+                                          ? 'Özelliği Kaldır'
+                                          : 'Özelliği Ekle'}
+                                      </span>
+                                    </div>
+                                  </button>
+                                </td>
+                                <td className='text-center py-2 border-r'>
+                                  {item.colourType}
+                                </td>
 
-                                  <td className='text-center py-2 border-r'>
-                                    {item.colourDescription}
-                                  </td>
-                                  <td className='text-center py-2 border-r'>
-                                    {item.colourHex}
-                                  </td>
-                                  <td className='text-center py-2 border-r'>
-                                    {item.targetValue === 'plus'
-                                      ? '+ Ücret'
-                                      : item.targetValue === 'minus'
+                                <td className='text-center py-2 border-r'>
+                                  {item.colourDescription}
+                                </td>
+                                <td className='text-center py-2 border-r'>
+                                  {item.colourHex}
+                                </td>
+                                <td className='text-center py-2 border-r'>
+                                  {item.targetValue === 'plus'
+                                    ? '+ Ücret'
+                                    : item.targetValue === 'minus'
                                       ? '- Ücret'
                                       : item.targetValue === 'standard'
-                                      ? 'Standart'
-                                      : ''}
-                                  </td>
-                                  <td
-                                    className={`text-center py-2 border-r text-white ${
-                                      item.targetValue === 'plus'
-                                        ? 'bg-green-500'
-                                        : item.targetValue === 'minus'
-                                        ? 'bg-red-500'
-                                        : ''
+                                        ? 'Standart'
+                                        : ''}
+                                </td>
+                                <td
+                                  className={`text-center py-2 border-r text-white ${item.targetValue === 'plus'
+                                    ? 'bg-green-500'
+                                    : item.targetValue === 'minus'
+                                      ? 'bg-red-500'
+                                      : ''
                                     }`}
-                                  >
-                                    {item.value}
-                                  </td>
-                                </tr>
-                              ))
+                                >
+                                  {item.value}
+                                </td>
+                              </tr>
+                            ))
                             : null}
                           {test && selectedCategory == 'Kumaşlar'
                             ? test['Kumaşlar'].map((item, index) => (
-                                <tr
-                                  key={index}
-                                  className={`${
-                                    selectedCategory == 'Kumaşlar'
-                                      ? 'table-row border-b'
-                                      : 'hidden'
+                              <tr
+                                key={index}
+                                className={`${selectedCategory == 'Kumaşlar'
+                                  ? 'table-row border-b'
+                                  : 'hidden'
                                   }`}
-                                >
-                                  <td className='text-center py-2 border-r'>
-                                    <button
-                                      onClick={() =>
-                                        props.values.selectedOfferFeatures.Kumaşlar.filter(
-                                          (feature) => feature.id === item.id
-                                        ).length > 0
-                                          ? deleteOfferedFeatures(
-                                              item,
-                                              'Kumaşlar',
-                                              props
-                                            )
-                                          : addOfferedFeatures(
-                                              item,
-                                              'Kumaşlar',
-                                              props
-                                            )
-                                      }
-                                      type='button'
-                                      className={`${
-                                        props.values.selectedOfferFeatures.Kumaşlar.filter(
-                                          (feature) => feature.id === item.id
-                                        ).length > 0
-                                          ? 'bg-red-500'
-                                          : 'bg-blue-500'
+                              >
+                                <td className='text-center py-2 border-r'>
+                                  <button
+                                    onClick={() =>
+                                      props.values.selectedOfferFeatures.Kumaşlar.filter(
+                                        (feature) => feature.id === item.id
+                                      ).length > 0
+                                        ? deleteOfferedFeatures(
+                                          item,
+                                          'Kumaşlar',
+                                          props
+                                        )
+                                        : addOfferedFeatures(
+                                          item,
+                                          'Kumaşlar',
+                                          props
+                                        )
+                                    }
+                                    type='button'
+                                    className={`${props.values.selectedOfferFeatures.Kumaşlar.filter(
+                                      (feature) => feature.id === item.id
+                                    ).length > 0
+                                      ? 'bg-red-500'
+                                      : 'bg-blue-500'
                                       } rounded hover:cursor-pointer hover:scale-110 transition-all inline-block text-white font-bold text-md shadow`}
-                                    >
-                                      <div className='p-2 flex flex-row justify-center items-center gap-2 whitespace-nowrap'>
-                                        <span className='hidden lg:block'>
-                                          {props.values.selectedOfferFeatures.Kumaşlar.filter(
-                                            (feature) => feature.id === item.id
-                                          ).length > 0
-                                            ? 'Özelliği Kaldır'
-                                            : 'Özelliği Ekle'}
-                                        </span>
-                                      </div>
-                                    </button>
-                                  </td>
-                                  <td className='text-center py-2 border-r'>
-                                    {item.fabricType}
-                                  </td>
-                                  <td className='text-center py-2 border-r'>
-                                    {item.fabricDescription}
-                                  </td>
-                                  <td className='text-center py-2 border-r'>
-                                    {item.fabricSwatch}
-                                  </td>
-                                  <td className='text-center py-2 border-r'>
-                                    {item.image && (
-                                      <div className='text-center flex justify-center item-center'>
-                                        <Image
-                                          src={item.image}
-                                          className='hover:scale-150 transition-all rounded shadow'
-                                          alt={item.fabricType}
-                                          width={100}
-                                          height={100}
-                                        />
-                                      </div>
-                                    )}
-                                  </td>
-                                  <td className='text-center py-2 border-r'>
-                                    {item.targetValue === 'plus'
-                                      ? '+ Ücret'
-                                      : item.targetValue === 'minus'
+                                  >
+                                    <div className='p-2 flex flex-row justify-center items-center gap-2 whitespace-nowrap'>
+                                      <span className='hidden lg:block'>
+                                        {props.values.selectedOfferFeatures.Kumaşlar.filter(
+                                          (feature) => feature.id === item.id
+                                        ).length > 0
+                                          ? 'Özelliği Kaldır'
+                                          : 'Özelliği Ekle'}
+                                      </span>
+                                    </div>
+                                  </button>
+                                </td>
+                                <td className='text-center py-2 border-r'>
+                                  {item.fabricType}
+                                </td>
+                                <td className='text-center py-2 border-r'>
+                                  {item.fabricDescription}
+                                </td>
+                                <td className='text-center py-2 border-r'>
+                                  {item.fabricSwatch}
+                                </td>
+                                <td className='text-center py-2 border-r'>
+                                  {item.image && (
+                                    <div className='text-center flex justify-center item-center'>
+                                      <Image
+                                        src={item.image}
+                                        className='hover:scale-150 transition-all rounded shadow'
+                                        alt={item.fabricType}
+                                        width={100}
+                                        height={100}
+                                      />
+                                    </div>
+                                  )}
+                                </td>
+                                <td className='text-center py-2 border-r'>
+                                  {item.targetValue === 'plus'
+                                    ? '+ Ücret'
+                                    : item.targetValue === 'minus'
                                       ? '- Ücret'
                                       : item.targetValue === 'standard'
-                                      ? 'Standart'
-                                      : ''}
-                                  </td>
-                                  <td
-                                    className={`text-center py-2 border-r text-white ${
-                                      item.targetValue === 'plus'
-                                        ? 'bg-green-500'
-                                        : item.targetValue === 'minus'
-                                        ? 'bg-red-500'
-                                        : ''
+                                        ? 'Standart'
+                                        : ''}
+                                </td>
+                                <td
+                                  className={`text-center py-2 border-r text-white ${item.targetValue === 'plus'
+                                    ? 'bg-green-500'
+                                    : item.targetValue === 'minus'
+                                      ? 'bg-red-500'
+                                      : ''
                                     }`}
-                                  >
-                                    {item.value}
-                                  </td>
-                                </tr>
-                              ))
+                                >
+                                  {item.value}
+                                </td>
+                              </tr>
+                            ))
                             : null}
                           {test && selectedCategory == 'Metaller'
                             ? test['Metaller'].map((item, index) => (
-                                <tr
-                                  key={index}
-                                  className={`${
-                                    selectedCategory == 'Metaller'
-                                      ? 'table-row border-b'
-                                      : 'hidden'
+                              <tr
+                                key={index}
+                                className={`${selectedCategory == 'Metaller'
+                                  ? 'table-row border-b'
+                                  : 'hidden'
                                   }`}
-                                >
-                                  <td className='text-center py-2 border-r'>
-                                    <button
-                                      onClick={() =>
-                                        props.values.selectedOfferFeatures.Metaller.filter(
-                                          (feature) => feature.id === item.id
-                                        ).length > 0
-                                          ? deleteOfferedFeatures(
-                                              item,
-                                              'Metaller',
-                                              props
-                                            )
-                                          : addOfferedFeatures(
-                                              item,
-                                              'Metaller',
-                                              props
-                                            )
-                                      }
-                                      type='button'
-                                      className={`${
-                                        props.values.selectedOfferFeatures.Metaller.filter(
-                                          (feature) => feature.id === item.id
-                                        ).length > 0
-                                          ? 'bg-red-500'
-                                          : 'bg-blue-500'
+                              >
+                                <td className='text-center py-2 border-r'>
+                                  <button
+                                    onClick={() =>
+                                      props.values.selectedOfferFeatures.Metaller.filter(
+                                        (feature) => feature.id === item.id
+                                      ).length > 0
+                                        ? deleteOfferedFeatures(
+                                          item,
+                                          'Metaller',
+                                          props
+                                        )
+                                        : addOfferedFeatures(
+                                          item,
+                                          'Metaller',
+                                          props
+                                        )
+                                    }
+                                    type='button'
+                                    className={`${props.values.selectedOfferFeatures.Metaller.filter(
+                                      (feature) => feature.id === item.id
+                                    ).length > 0
+                                      ? 'bg-red-500'
+                                      : 'bg-blue-500'
                                       } rounded hover:cursor-pointer hover:scale-110 transition-all inline-block text-white font-bold text-md shadow`}
-                                    >
-                                      <div className='p-2 flex flex-row justify-center items-center gap-2 whitespace-nowrap'>
-                                        <span className='hidden lg:block'>
-                                          {props.values.selectedOfferFeatures.Metaller.filter(
-                                            (feature) => feature.id === item.id
-                                          ).length > 0
-                                            ? 'Özelliği Kaldır'
-                                            : 'Özelliği Ekle'}
-                                        </span>
-                                      </div>
-                                    </button>
-                                  </td>
-                                  <td className='text-center py-2 border-r'>
-                                    {item.metalType}
-                                  </td>
-                                  <td className='text-center py-2 border-r'>
-                                    {item.metalDescription}
-                                  </td>
-                                  <td className='text-center py-2 border-r'>
-                                    {item.image && (
-                                      <div className='text-center flex justify-center item-center'>
-                                        <Image
-                                          src={item.image}
-                                          className='hover:scale-150 transition-all rounded shadow'
-                                          alt={item.metalType}
-                                          width={100}
-                                          height={100}
-                                        />
-                                      </div>
-                                    )}
-                                  </td>
-                                  <td className='text-center py-2 border-r'>
-                                    {item.targetValue === 'plus'
-                                      ? '+ Ücret'
-                                      : item.targetValue === 'minus'
+                                  >
+                                    <div className='p-2 flex flex-row justify-center items-center gap-2 whitespace-nowrap'>
+                                      <span className='hidden lg:block'>
+                                        {props.values.selectedOfferFeatures.Metaller.filter(
+                                          (feature) => feature.id === item.id
+                                        ).length > 0
+                                          ? 'Özelliği Kaldır'
+                                          : 'Özelliği Ekle'}
+                                      </span>
+                                    </div>
+                                  </button>
+                                </td>
+                                <td className='text-center py-2 border-r'>
+                                  {item.metalType}
+                                </td>
+                                <td className='text-center py-2 border-r'>
+                                  {item.metalDescription}
+                                </td>
+                                <td className='text-center py-2 border-r'>
+                                  {item.image && (
+                                    <div className='text-center flex justify-center item-center'>
+                                      <Image
+                                        src={item.image}
+                                        className='hover:scale-150 transition-all rounded shadow'
+                                        alt={item.metalType}
+                                        width={100}
+                                        height={100}
+                                      />
+                                    </div>
+                                  )}
+                                </td>
+                                <td className='text-center py-2 border-r'>
+                                  {item.targetValue === 'plus'
+                                    ? '+ Ücret'
+                                    : item.targetValue === 'minus'
                                       ? '- Ücret'
                                       : item.targetValue === 'standard'
-                                      ? 'Standart'
-                                      : ''}
-                                  </td>
-                                  <td
-                                    className={`text-center py-2 border-r text-white ${
-                                      item.targetValue === 'plus'
-                                        ? 'bg-green-500'
-                                        : item.targetValue === 'minus'
-                                        ? 'bg-red-500'
-                                        : ''
+                                        ? 'Standart'
+                                        : ''}
+                                </td>
+                                <td
+                                  className={`text-center py-2 border-r text-white ${item.targetValue === 'plus'
+                                    ? 'bg-green-500'
+                                    : item.targetValue === 'minus'
+                                      ? 'bg-red-500'
+                                      : ''
                                     }`}
-                                  >
-                                    {item.value}
-                                  </td>
-                                </tr>
-                              ))
+                                >
+                                  {item.value}
+                                </td>
+                              </tr>
+                            ))
                             : null}
                           {test && selectedCategory == 'Ölçüler'
                             ? test['Ölçüler'].map((item, index) => (
-                                <tr
-                                  key={index}
-                                  className={`${
-                                    selectedCategory == 'Ölçüler'
-                                      ? 'table-row border-b'
-                                      : 'hidden'
+                              <tr
+                                key={index}
+                                className={`${selectedCategory == 'Ölçüler'
+                                  ? 'table-row border-b'
+                                  : 'hidden'
                                   }`}
-                                >
-                                  <td className='text-center py-2 border-r'>
-                                    <button
-                                      onClick={() =>
-                                        props.values.selectedOfferFeatures.Ölçüler.filter(
-                                          (feature) => feature.id === item.id
-                                        ).length > 0
-                                          ? deleteOfferedFeatures(
-                                              item,
-                                              'Ölçüler',
-                                              props
-                                            )
-                                          : addOfferedFeatures(
-                                              item,
-                                              'Ölçüler',
-                                              props
-                                            )
-                                      }
-                                      type='button'
-                                      className={`${
-                                        props.values.selectedOfferFeatures.Ölçüler.filter(
-                                          (feature) => feature.id === item.id
-                                        ).length > 0
-                                          ? 'bg-red-500'
-                                          : 'bg-blue-500'
+                              >
+                                <td className='text-center py-2 border-r'>
+                                  <button
+                                    onClick={() =>
+                                      props.values.selectedOfferFeatures.Ölçüler.filter(
+                                        (feature) => feature.id === item.id
+                                      ).length > 0
+                                        ? deleteOfferedFeatures(
+                                          item,
+                                          'Ölçüler',
+                                          props
+                                        )
+                                        : addOfferedFeatures(
+                                          item,
+                                          'Ölçüler',
+                                          props
+                                        )
+                                    }
+                                    type='button'
+                                    className={`${props.values.selectedOfferFeatures.Ölçüler.filter(
+                                      (feature) => feature.id === item.id
+                                    ).length > 0
+                                      ? 'bg-red-500'
+                                      : 'bg-blue-500'
                                       } rounded hover:cursor-pointer hover:scale-110 transition-all inline-block text-white font-bold text-md shadow`}
-                                    >
-                                      <div className='p-2 flex flex-row justify-center items-center gap-2 whitespace-nowrap'>
-                                        <span className='hidden lg:block'>
-                                          {props.values.selectedOfferFeatures.Ölçüler.filter(
-                                            (feature) => feature.id === item.id
-                                          ).length > 0
-                                            ? 'Özelliği Kaldır'
-                                            : 'Özelliği Ekle'}
-                                        </span>
-                                      </div>
-                                    </button>
-                                  </td>
-                                  <td className='text-center py-2 border-r'>
-                                    {item.firstValue}
-                                  </td>
-                                  <td className='text-center py-2 border-r'>
-                                    {item.secondValue}
-                                  </td>
-                                  <td className='text-center py-2 border-r'>
-                                    {item.unit}
-                                  </td>
-                                  <td className='text-center py-2 border-r'>
-                                    {item.targetValue === 'plus'
-                                      ? '+ Ücret'
-                                      : item.targetValue === 'minus'
+                                  >
+                                    <div className='p-2 flex flex-row justify-center items-center gap-2 whitespace-nowrap'>
+                                      <span className='hidden lg:block'>
+                                        {props.values.selectedOfferFeatures.Ölçüler.filter(
+                                          (feature) => feature.id === item.id
+                                        ).length > 0
+                                          ? 'Özelliği Kaldır'
+                                          : 'Özelliği Ekle'}
+                                      </span>
+                                    </div>
+                                  </button>
+                                </td>
+                                <td className='text-center py-2 border-r'>
+                                  {item.firstValue}
+                                </td>
+                                <td className='text-center py-2 border-r'>
+                                  {item.secondValue}
+                                </td>
+                                <td className='text-center py-2 border-r'>
+                                  {item.unit}
+                                </td>
+                                <td className='text-center py-2 border-r'>
+                                  {item.targetValue === 'plus'
+                                    ? '+ Ücret'
+                                    : item.targetValue === 'minus'
                                       ? '- Ücret'
                                       : item.targetValue === 'standard'
-                                      ? 'Standart'
-                                      : ''}
-                                  </td>
-                                  <td
-                                    className={`text-center py-2 border-r text-white ${
-                                      item.targetValue === 'plus'
-                                        ? 'bg-green-500'
-                                        : item.targetValue === 'minus'
-                                        ? 'bg-red-500'
-                                        : ''
+                                        ? 'Standart'
+                                        : ''}
+                                </td>
+                                <td
+                                  className={`text-center py-2 border-r text-white ${item.targetValue === 'plus'
+                                    ? 'bg-green-500'
+                                    : item.targetValue === 'minus'
+                                      ? 'bg-red-500'
+                                      : ''
                                     }`}
-                                  >
-                                    {item.value}
-                                  </td>
-                                </tr>
-                              ))
+                                >
+                                  {item.value}
+                                </td>
+                              </tr>
+                            ))
                             : null}
                           {test && selectedCategory == 'Extra'
                             ? test['Extra'].map((item, index) => (
-                                <tr
-                                  key={index}
-                                  className={`${
-                                    selectedCategory == 'Extra'
-                                      ? 'table-row border-b'
-                                      : 'hidden'
+                              <tr
+                                key={index}
+                                className={`${selectedCategory == 'Extra'
+                                  ? 'table-row border-b'
+                                  : 'hidden'
                                   }`}
-                                >
-                                  <td className='text-center py-2 border-r'>
-                                    <button
-                                      onClick={() =>
-                                        props.values.selectedOfferFeatures.Extra.filter(
-                                          (feature) => feature.id === item.id
-                                        ).length > 0
-                                          ? deleteOfferedFeatures(
-                                              item,
-                                              'Extra',
-                                              props
-                                            )
-                                          : addOfferedFeatures(
-                                              item,
-                                              'Extra',
-                                              props
-                                            )
-                                      }
-                                      type='button'
-                                      className={`${
-                                        props.values.selectedOfferFeatures.Extra.filter(
-                                          (feature) => feature.id === item.id
-                                        ).length > 0
-                                          ? 'bg-red-500'
-                                          : 'bg-blue-500'
+                              >
+                                <td className='text-center py-2 border-r'>
+                                  <button
+                                    onClick={() =>
+                                      props.values.selectedOfferFeatures.Extra.filter(
+                                        (feature) => feature.id === item.id
+                                      ).length > 0
+                                        ? deleteOfferedFeatures(
+                                          item,
+                                          'Extra',
+                                          props
+                                        )
+                                        : addOfferedFeatures(
+                                          item,
+                                          'Extra',
+                                          props
+                                        )
+                                    }
+                                    type='button'
+                                    className={`${props.values.selectedOfferFeatures.Extra.filter(
+                                      (feature) => feature.id === item.id
+                                    ).length > 0
+                                      ? 'bg-red-500'
+                                      : 'bg-blue-500'
                                       } rounded hover:cursor-pointer hover:scale-110 transition-all inline-block text-white font-bold text-md shadow`}
-                                    >
-                                      <div className='p-2 flex flex-row justify-center items-center gap-2 whitespace-nowrap'>
-                                        <span className='hidden lg:block'>
-                                          {props.values.selectedOfferFeatures.Extra.filter(
-                                            (feature) => feature.id === item.id
-                                          ).length > 0
-                                            ? 'Özelliği Kaldır'
-                                            : 'Özelliği Ekle'}
-                                        </span>
-                                      </div>
-                                    </button>
-                                  </td>
-                                  <td className='text-center py-2 border-r'>
-                                    {item.extraValue}
-                                  </td>
-                                  <td className='text-center py-2 border-r'>
-                                    {item.targetValue === 'plus'
-                                      ? '+ Ücret'
-                                      : item.targetValue === 'minus'
+                                  >
+                                    <div className='p-2 flex flex-row justify-center items-center gap-2 whitespace-nowrap'>
+                                      <span className='hidden lg:block'>
+                                        {props.values.selectedOfferFeatures.Extra.filter(
+                                          (feature) => feature.id === item.id
+                                        ).length > 0
+                                          ? 'Özelliği Kaldır'
+                                          : 'Özelliği Ekle'}
+                                      </span>
+                                    </div>
+                                  </button>
+                                </td>
+                                <td className='text-center py-2 border-r'>
+                                  {item.extraValue}
+                                </td>
+                                <td className='text-center py-2 border-r'>
+                                  {item.targetValue === 'plus'
+                                    ? '+ Ücret'
+                                    : item.targetValue === 'minus'
                                       ? '- Ücret'
                                       : item.targetValue === 'standard'
-                                      ? 'Standart'
-                                      : ''}
-                                  </td>
-                                  <td
-                                    className={`text-center py-2 border-r text-white ${
-                                      item.targetValue === 'plus'
-                                        ? 'bg-green-500'
-                                        : item.targetValue === 'minus'
-                                        ? 'bg-red-500'
-                                        : ''
+                                        ? 'Standart'
+                                        : ''}
+                                </td>
+                                <td
+                                  className={`text-center py-2 border-r text-white ${item.targetValue === 'plus'
+                                    ? 'bg-green-500'
+                                    : item.targetValue === 'minus'
+                                      ? 'bg-red-500'
+                                      : ''
                                     }`}
-                                  >
-                                    {item.value}
-                                  </td>
-                                </tr>
-                              ))
+                                >
+                                  {item.value}
+                                </td>
+                              </tr>
+                            ))
                             : null}
                         </tbody>
                       </table>
@@ -992,11 +978,10 @@ function ListProducts({
           </Formik>
         )
       }
-      <div className='w-full overflow-x-scroll lg:overflow-x-auto'>
+      <div className='w-full overflow-x-scroll bg-white lg:overflow-x-auto'>
         <table
-          className={`${
-            selectedImage && 'blur'
-          } w-full text-sm text-left text-gray-500 dark:text-gray-400`}
+          className={`${selectedImage && 'blur'
+            } w-full text-sm text-left text-gray-500 dark:text-gray-400`}
         >
           <thead className='text-md text-gray-700 bg-gray-50 dark:bg-blue-500 dark:text-white'>
             {renderHead()}

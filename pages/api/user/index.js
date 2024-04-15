@@ -1,30 +1,21 @@
+import prisma from '@/lib/prisma';
 import { getDataByUnique } from '@/services/serviceOperations';
 
 const handler = async (req, res) => {
   try {
     if (req.method === 'GET') {
-      const { personelId, customerId } = req.query;
+      const { id } = req.query;
 
-      if (personelId) {
-        const response = await getDataByUnique('User', {
-          id: personelId,
-        });
+      const data = await prisma.user.findUnique({
+        where: {
+          id: id
+        }
+      });;
 
-        return res.status(200).json({
-          status: 'success',
-          personel: response,
-        });
-      }
-      if (customerId) {
-        const response = await getDataByUnique('User', {
-          id: customerId,
-        });
-
-        return res.status(200).json({
-          status: 'success',
-          customer: response,
-        });
-      }
+      return res.status(200).json({
+        status: 'success',
+        data: data,
+      });
     }
   } catch (error) {
     return res

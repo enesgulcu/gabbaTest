@@ -9,7 +9,7 @@ import {
 } from 'react-icons/io5';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import LoadingScreen from '@/components/other/loading';
 import { getAPI, postAPI } from '@/services/fetchAPI';
 
@@ -637,18 +637,6 @@ const ListCollection = ({
   // gelen verileri tablo haline getiriyoruz ve listeliyoruz.
   return (
     <div className='w-full'>
-      <ToastContainer
-        position='top-right'
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme='dark'
-      />
       {isloading && <LoadingScreen isloading={isloading} />}
 
       {

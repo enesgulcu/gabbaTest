@@ -11,7 +11,7 @@ import {
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import LoadingScreen from '@/components/other/loading';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import CreateCollection from '@/components/createProduct/createProduct/createCollection';
 
@@ -1047,18 +1047,6 @@ const ListFeatureTable = ({
   // gelen verileri tablo haline getiriyoruz ve listeliyoruz.
   return (
     <div className='w-full'>
-      <ToastContainer
-        position='top-right'
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme='dark'
-      />
       {isloading && <LoadingScreen isloading={isloading} />}
 
       {/* Ürün Özelliklerini Listeleme */}

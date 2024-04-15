@@ -6,7 +6,7 @@ import { BiFilterAlt } from 'react-icons/bi';
 import { IoClose } from 'react-icons/io5';
 import { RxPlusCircled, RxTriangleRight } from 'react-icons/rx';
 import ListFinancialComponent from './listFinancialManagement';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { getAPI } from '@/services/fetchAPI';
 import TestFinancialComponent from './testFinancialManagement';
 import EditFinancialManagementComponent from './editFinancialManagement';
@@ -65,9 +65,7 @@ const FinancialManagementComponent = () => {
       const response = await getAPI('/financialManagement');
       // İşlem sırasına göre düzeltiyoruz. Veritabanında sırasız bir şekilde tutuluyor.
       response.data.sort((a, b) => a.orderValue - b.orderValue);
-      const responseSpecial = await getAPI(
-        '/financialManagementSpecial'
-      );
+      const responseSpecial = await getAPI('/financialManagementSpecial');
       setFinancialManagementsSpecial(responseSpecial.data);
       if (!response || !responseSpecial) {
         throw new Error('Veri çekilemedi 2');
@@ -95,8 +93,6 @@ const FinancialManagementComponent = () => {
           }
         });
       });
-
-      console.log(response.data);
 
       setIsloading(false);
 
@@ -131,18 +127,6 @@ const FinancialManagementComponent = () => {
   return (
     <>
       {isloading && <LoadingScreen isloading={isloading} />}
-      <ToastContainer
-        position='top-right'
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme='dark'
-      />
       {showSpecialFinancialManagement && (
         <div
           className={`cursor-default w-screen absolute bg-black bg-opacity-90 z-50 py-4 min-h-screen max-w-full`}

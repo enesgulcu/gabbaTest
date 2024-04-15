@@ -133,7 +133,6 @@ const Invoice = ({ data, lang }) => {
       data.Ürünler
         .filter((x_f) => x_f.id === pr_id)
         .forEach((x_m) => {
-          console.log(x_m);
           x_d = {
             ...x_d,
             info: x_m.productType,
@@ -151,121 +150,131 @@ const Invoice = ({ data, lang }) => {
       {
         /* Extralar içerisinde gezip orderId product id ile eşit olanların içerisinde gezip extras yani ürün özelliklerine bu datayı gödneriyoruz */
       }
-      data.Extralar?.filter((x_f) => x_f.orderId === pr_id)?.forEach((x_k) => {
-        x_d = {
-          ...x_d,
-          extras: x_d?.extras
-            ? [
-                ...x_d.extras,
-                {
-                  name: 'Extra',
-                  value: x_k.extravalue,
-                },
-              ]
-            : [
-                {
-                  name: 'Extra',
-                  value: x_k.extravalue,
-                },
-              ],
-        };
-      });
-
-      {
-        /* Kunaşlar içerisinde gezip orderId - order id ile eşit olanların içerisinde gezip extras yani ürün özelliklerine bu datayı gödneriyoruz */
-      }
-      data.Kumaşlar?.filter((x_f) => x_f.orderId === or_id)?.forEach((x_k) => {
-        x_d = {
-          ...x_d,
-          extras: x_d?.extras
-            ? [
-                ...x_d.extras,
-                {
-                  name: 'Kumaş',
-                  value: x_k.fabricType,
-                },
-              ]
-            : [
-                {
-                  name: 'Kumaş',
-                  value: x_k.fabricType,
-                },
-              ],
-        };
-      });
-
-      {
-        /* Metaller içerisinde gezip orderId - order id ile eşit olanların içerisinde gezip extras yani ürün özelliklerine bu datayı gödneriyoruz */
-      }
-      data.Metaller?.filter((x_f) => x_f.orderId === or_id)?.forEach((x_m) => {
-        x_d = {
-          ...x_d,
-          extras: x_d?.extras
-            ? [
-                ...x_d.extras,
-                {
-                  name: 'Metal',
-                  value: x_m.metalType,
-                },
-              ]
-            : [
-                {
-                  name: 'Metal',
-                  value: x_m.metalType,
-                },
-              ],
-        };
-      });
-
-      {
-        /* Renkler içerisinde gezip orderId - order id ile eşit olanların içerisinde gezip extras yani ürün özelliklerine bu datayı gödneriyoruz */
-      }
-      data.Renkler.filter((x_f) => x_f.orderId === or_id).forEach((x_m) => {
-        x_d = {
-          ...x_d,
-          extras: x_d?.extras
-            ? [
-                ...x_d.extras,
-                {
-                  name: 'Renk',
-                  value: x_m.colourHex,
-                },
-              ]
-            : [
-                {
-                  name: 'Renk',
-                  value: x_m.colourHex,
-                },
-              ],
-        };
-      });
-
-      {
-        /* Ölçüler içerisinde gezip orderId - order id ile eşit olanların içerisinde gezip extras yani ürün özelliklerine bu datayı gödneriyoruz */
-      }
-      data.Ölçüler
-        .filter((x_f) => x_f.orderId === or_id)
-        .forEach((x_m) => {
-          const formated = x_m.firstValue + x_m.unit + x_m.secondValue;
-
+      if (Array.isArray(data.Extralar) && data.Extralar.length > 0) {
+        data.Extralar?.filter((x_f) => x_f?.orderId === pr_id)?.forEach((x_k) => {
           x_d = {
             ...x_d,
             extras: x_d?.extras
               ? [
+                ...x_d.extras,
+                {
+                  name: 'Extra',
+                  value: x_k.extravalue,
+                },
+              ]
+              : [
+                {
+                  name: 'Extra',
+                  value: x_k.extravalue,
+                },
+              ],
+          };
+        });
+      }
+
+      {
+        /* Kunaşlar içerisinde gezip orderId - order id ile eşit olanların içerisinde gezip extras yani ürün özelliklerine bu datayı gödneriyoruz */
+      }
+      if (Array.isArray(data?.Kumaşlar) && data?.Kumaşlar.length > 0) {
+        data?.Kumaşlar?.filter((x_f) => x_f?.orderId === or_id)?.forEach((x_k) => {
+          x_d = {
+            ...x_d,
+            extras: x_d?.extras
+              ? [
+                ...x_d.extras,
+                {
+                  name: 'Kumaş',
+                  value: x_k.fabricType,
+                },
+              ]
+              : [
+                {
+                  name: 'Kumaş',
+                  value: x_k.fabricType,
+                },
+              ],
+          };
+        });
+      }
+
+      {
+        /* Metaller içerisinde gezip orderId - order id ile eşit olanların içerisinde gezip extras yani ürün özelliklerine bu datayı gödneriyoruz */
+      }
+      if (Array.isArray(data?.Metaller) && data?.Metaller.length > 0) {
+        data.Metaller?.filter((x_f) => x_f.orderId === or_id)?.forEach((x_m) => {
+          x_d = {
+            ...x_d,
+            extras: x_d?.extras
+              ? [
+                ...x_d.extras,
+                {
+                  name: 'Metal',
+                  value: x_m.metalType,
+                },
+              ]
+              : [
+                {
+                  name: 'Metal',
+                  value: x_m.metalType,
+                },
+              ],
+          };
+        });
+      }
+
+      {
+        /* Renkler içerisinde gezip orderId - order id ile eşit olanların içerisinde gezip extras yani ürün özelliklerine bu datayı gödneriyoruz */
+      }
+      if (Array.isArray(data?.Renkler) && data?.Renkler.length > 0) {
+        data.Renkler.filter((x_f) => x_f && x_f?.orderId === or_id).forEach((x_m) => {
+          x_d = {
+            ...x_d,
+            extras: x_d?.extras
+              ? [
+                ...x_d.extras,
+                {
+                  name: 'Renk',
+                  value: x_m.colourHex,
+                },
+              ]
+              : [
+                {
+                  name: 'Renk',
+                  value: x_m.colourHex,
+                },
+              ],
+          };
+        });
+      }
+
+      {
+        /* Ölçüler içerisinde gezip orderId - order id ile eşit olanların içerisinde gezip extras yani ürün özelliklerine bu datayı gödneriyoruz */
+      }
+      if (Array.isArray(data?.Ölçüler) && data?.Ölçüler.length > 0) {
+        data.Ölçüler
+          .filter((x_f) => x_f.orderId === or_id)
+          .forEach((x_m) => {
+            const formated = x_m.firstValue + x_m.unit + x_m.secondValue;
+
+            x_d = {
+              ...x_d,
+              extras: x_d?.extras
+                ? [
                   ...x_d.extras,
                   {
                     name: 'Ölçü',
                     value: formated,
                   },
                 ]
-              : [
+                : [
                   {
                     name: 'Ölçü',
                     value: formated,
                   },
                 ],
-          };
-        });
+            };
+          });
+      }
 
       res.products.push(x_d);
     });

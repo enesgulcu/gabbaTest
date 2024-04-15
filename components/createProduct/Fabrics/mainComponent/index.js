@@ -4,7 +4,7 @@ import {postAPI, getAPI} from '@/services/fetchAPI';
 import { Formik, Form, Field, FieldArray, ErrorMessage } from "formik";
 import Image from 'next/image';
 import LoadingScreen from '@/components/other/loading';
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { useState , useEffect} from 'react';
 import { MdOutlineCancel } from "react-icons/md";
@@ -219,18 +219,6 @@ import ProcessBase64Array from '@/functions/others/base64SizeCalculate';
         } ${isUpdateActive && "blur-sm max-h-screen overflow-hidden"}
         `}
       >
-        <ToastContainer
-          position="top-right"
-          autoClose={5000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="dark"
-        />
         <Formik
           initialValues={initialValues}
           validationSchema={FabricsValidationSchema}
